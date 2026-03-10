@@ -98,11 +98,7 @@ function getGapToNextCarAhead(currentState) {
     return minGap;
 }
 
-function updateVehicleState(state, dt, draftWindow) {
-    if (state.finished) return;
-
-    state.currentLapTime += dt;
-
+function buildPhysicsContext(state, dt) {
     const INTERNAL_TO_MS = PROGRESS_SCALE * METERS_PER_PROGRESS_STEP;
     const REDLINE = state.car.redline || 8000;
     const gearRatios = state.car.gearRatios || [1.0];
@@ -113,25 +109,10 @@ function updateVehicleState(state, dt, draftWindow) {
 
     if (typeof state.currentGear !== 'number') state.currentGear = 0;
     state.currentGear = Math.max(0, Math.min(state.currentGear, gearRatios.length - 1));
+
     let accelStatNorm = Math.max(0.4, Math.min(1.3, state.stats.acceleration / 100));
     let powerToWeight = Math.max(0.12, state.car.hp / Math.max(700, state.car.weight));
 
-    function getEffectiveGearRatio(gearIdx) {
-        let base = gearRatios[Math.max(0, Math.min(gearIdx, gearRatios.length - 1))] || 1.0;
-        let shortGearBoost = gearIdx <= 2 ? (1.03 + (accelStatNorm * 0.05) + (powerToWeight * 0.06)) : 1.0;
-        let highGearTrim = gearIdx >= 3 ? 0.985 : 1.0;
-        return base * shortGearBoost * highGearTrim;
-    }
-
-    function getShiftTime(targetGearIdx, isDownshift) {
-        let statFactor = 1.0 - (accelStatNorm * 0.20) - (powerToWeight * 0.10);
-        statFactor = Math.max(0.72, Math.min(1.05, statFactor));
-        let earlyGearFactor = targetGearIdx <= 2 ? 0.72 : 1.0;
-        let downshiftFactor = isDownshift ? 0.90 : 1.0;
-        return Math.max(0.055, state.shiftTimeRequired * statFactor * earlyGearFactor * downshiftFactor);
-    }
-
-    let currentGearRatio = getEffectiveGearRatio(state.currentGear);
     let speedMs = state.speed * INTERNAL_TO_MS;
     if (typeof state.prevSpeedMs !== 'number') state.prevSpeedMs = speedMs;
     let longitudinalAccelMs2 = (speedMs - state.prevSpeedMs) / Math.max(0.001, dt);
@@ -146,26 +127,39 @@ function updateVehicleState(state, dt, draftWindow) {
     let weightTransfer = Math.max(-0.18, Math.min(0.18, (-longitudinalAccelMs2 / 9.81) * 0.14));
     let frontLoadBias = 0.5 + weightTransfer;
 
-    const rhoAir = 1.225;
-    let clA = Math.max(0.2, (state.car.downforceCoeff || 0.75) * (0.8 + handlingFactor * 0.6));
-    let downforceN = 0.5 * rhoAir * clA * speedMs * speedMs;
-    let staticLoadN = state.car.weight * 9.81;
-    let aeroLoadFactor = Math.max(1.0, (staticLoadN + downforceN) / staticLoadN);
+    // Use aerodynamics module
+    let aeroContext = calculateAerodynamicContext(state, state.car, { speedMs });
+    let actualGrip = getLoadSensitiveGrip(baseGrip, aeroContext.aeroLoadFactor, terrainMult);
 
-    let loadSensitiveGrip = baseGrip * (0.86 + 0.20 * Math.sqrt(aeroLoadFactor));
-    let actualGrip = loadSensitiveGrip * terrainMult;
-
-    let hpAjustado = state.car.hp * (0.5 + (state.stats.topSpeed / 200));
-    let powerWatts = hpAjustado * 745.7;
     let cdA = Math.max(0.2, state.car.dragCoeff * 2.1);
-    let vmaxMs = Math.pow(powerWatts / (0.5 * rhoAir * cdA), 1 / 3);
-    let maxPossibleSpeed = (vmaxMs / INTERNAL_TO_MS) * terrainMult * state.driverPace;
+    let maxPossibleSpeed = calculateMaxSpeedFromPower(state.car, state.stats, terrainMult) * state.driverPace;
 
-    let visionDistanceMeters = (speedMs * 1.5) + ((speedMs * Math.max(1, speedMs)) / (2 * Math.max(1, brakeDecelMs2)));
+    return {
+        INTERNAL_TO_MS,
+        REDLINE,
+        gearRatios,
+        wheelRadius,
+        terrainMult,
+        accelStatNorm,
+        powerToWeight,
+        speedMs,
+        brakeDecelMs2,
+        brakeDecelInternal,
+        frontLoadBias,
+        actualGrip,
+        cdA,
+        maxPossibleSpeed
+    };
+}
+
+
+
+function computeTargetSpeedData(state, physics, draftWindow) {
+    let visionDistanceMeters = (physics.speedMs * 1.5) + ((physics.speedMs * Math.max(1, physics.speedMs)) / (2 * Math.max(1, physics.brakeDecelMs2)));
     let lookAheadPoints = Math.floor((visionDistanceMeters / METERS_PER_PROGRESS_STEP) * PROGRESS_SCALE);
     lookAheadPoints = Math.max(40, Math.min(Math.floor(trackPath.length * 0.75), lookAheadPoints));
 
-    let targetSpeed = maxPossibleSpeed;
+    let targetSpeed = physics.maxPossibleSpeed;
     let maxCurveAhead = 0;
 
     for (let i = 2; i <= lookAheadPoints; i += 4) {
@@ -177,11 +171,11 @@ function updateVehicleState(state, dt, draftWindow) {
 
         if (c > 0.08) {
             let curveRadius = 35 / c;
-            let trailBrakeGripBoost = 1 + Math.max(0, frontLoadBias - 0.5) * Math.min(1, state.brake) * 0.22;
-            let curveMaxSpeedMs = Math.sqrt(Math.max(0.01, (actualGrip * trailBrakeGripBoost) * 9.81 * curveRadius));
-            let curveMaxSpeedInternal = curveMaxSpeedMs / INTERNAL_TO_MS;
+            let trailBrakeGripBoost = 1 + Math.max(0, physics.frontLoadBias - 0.5) * Math.min(1, state.brake) * 0.22;
+            let curveMaxSpeedMs = Math.sqrt(Math.max(0.01, (physics.actualGrip * trailBrakeGripBoost) * 9.81 * curveRadius));
+            let curveMaxSpeedInternal = curveMaxSpeedMs / physics.INTERNAL_TO_MS;
             let distInternal = Math.max(0, i / PROGRESS_SCALE);
-            let safeSpeedSq = (curveMaxSpeedInternal * curveMaxSpeedInternal) + (2 * brakeDecelInternal * distInternal * 0.90);
+            let safeSpeedSq = (curveMaxSpeedInternal * curveMaxSpeedInternal) + (2 * physics.brakeDecelInternal * distInternal * 0.90);
             let safeSpeed = Math.sqrt(safeSpeedSq);
 
             if (safeSpeed < targetSpeed) {
@@ -196,7 +190,11 @@ function updateVehicleState(state, dt, draftWindow) {
         targetSpeed *= (1 + draftBonus);
     }
 
-    let speedError = targetSpeed - state.speed;
+    return { targetSpeed, maxCurveAhead };
+}
+
+function applyDriverInputsAndSlip(state, dt, physics, targetData) {
+    let speedError = targetData.targetSpeed - state.speed;
     let desiredThrottle = 0;
     let desiredBrake = 0;
 
@@ -214,156 +212,103 @@ function updateVehicleState(state, dt, draftWindow) {
     let currIdx = ((Math.floor(state.progressIdx) % trackPath.length) + trackPath.length) % trackPath.length;
     let currCurvature = trackPath[currIdx]?.curvature || 0;
 
-    let localRadiusMeters = 35 / Math.max(0.01, currCurvature);
-    let localMaxCornerSpeedMsBase = Math.sqrt(Math.max(0.01, actualGrip * 9.81 * localRadiusMeters));
-    let lateralAccelDemandMs2 = currCurvature > 0.01 ? ((speedMs * speedMs) / localRadiusMeters) : 0;
-    let lateralGripCapacityMs2 = actualGrip * 9.81;
-    let gripDemandRatio = lateralGripCapacityMs2 > 0 ? (lateralAccelDemandMs2 / lateralGripCapacityMs2) : 0;
+    // Use tire physics module
+    let slipData = calculateSlipAndGrip(state, physics, currCurvature);
+    let tireData = detectSlidingAndLocking(state, physics, slipData, currCurvature);
 
-    let slipNorm = Math.max(0, Math.min(2.0, (gripDemandRatio - 0.75) / 0.55));
-    let B = 9.0, C = 1.35, E = 0.97;
-    let bx = B * slipNorm;
-    let magicGripCurve = Math.sin(C * Math.atan(bx - E * (bx - Math.atan(bx))));
-    let gripFromSlip = Math.max(0.55, Math.min(1.02, magicGripCurve));
-
-    let slipAngleTarget = Math.max(0, Math.min(16, slipNorm * 12));
-    state.slipAngleDeg += (slipAngleTarget - state.slipAngleDeg) * Math.min(1, dt * 8);
-
-    let localMaxCornerSpeedMs = localMaxCornerSpeedMsBase * gripFromSlip;
-    let localMaxCornerSpeedInternal = localMaxCornerSpeedMs / INTERNAL_TO_MS;
-
-    let isSliding = false;
-    let overspeedRatio = localMaxCornerSpeedInternal > 0 ? (state.speed / localMaxCornerSpeedInternal) : 0;
-    if (currCurvature > 0.15 && overspeedRatio > 1.04) {
-        isSliding = true;
-        let slideSeverity = Math.min(1, (overspeedRatio - 1.04) / 0.25);
+    let isSliding = tireData.isSliding;
+    if (isSliding) {
+        let slideSeverity = Math.min(1, (slipData.slipNorm > 0 ? (slipData.slipNorm - 1.04) / 0.25 : 0));
         desiredThrottle *= (1 - 0.85 * slideSeverity);
         desiredBrake = Math.max(desiredBrake, 0.45 + 0.45 * slideSeverity);
-        state.speed -= (brakeDecelInternal * (0.20 + 0.45 * slideSeverity)) * dt;
+        state.speed -= (physics.brakeDecelInternal * (0.20 + 0.45 * slideSeverity)) * dt;
     }
 
     let pedalDt = dt * (isSliding ? 15.0 : 6.0);
     state.throttle += (desiredThrottle - state.throttle) * Math.min(1, pedalDt);
     state.brake += (desiredBrake - state.brake) * Math.min(1, pedalDt * 1.5);
 
-    let absQuality = Math.min(1, 0.15 + (state.stats.braking / 100) * 0.85);
-    let lockupRisk = Math.max(0, state.brake - 0.62)
-        * Math.max(0, 1 - terrainMult * 0.95)
-        * (1 - absQuality)
-        * Math.min(1.5, speedMs / 22);
-    state.wheelLock = Math.max(0, Math.min(1, lockupRisk * 2.3));
+    state.wheelLock = tireData.wheelLock;
     if (state.wheelLock > 0) {
         state.brake *= (1 - state.wheelLock * 0.45);
         if (currCurvature > 0.1) {
             desiredThrottle *= (1 - state.wheelLock * 0.35);
-            state.speed -= (brakeDecelInternal * 0.10 * state.wheelLock) * dt;
+            state.speed -= (physics.brakeDecelInternal * 0.10 * state.wheelLock) * dt;
         }
     }
+}
 
-    let wheelRpmReal = (speedMs / (2 * Math.PI * wheelRadius)) * 60;
-    let mechanicalEngineRpm = wheelRpmReal * currentGearRatio * FINAL_DRIVE_RATIO;
+function updateGearboxAndPreForceRpm(state, dt, physics, maxCurveAhead) {
+    let currentGearRatio = getEffectiveGearRatio(physics, state.currentGear);
+    let wheelRpmReal = (physics.speedMs / (2 * Math.PI * physics.wheelRadius)) * 60;
 
     if (typeof state.shiftCooldown !== 'number') state.shiftCooldown = 0;
     state.shiftCooldown = Math.max(0, state.shiftCooldown - dt);
 
-    let upshiftThreshold = (maxCurveAhead > 0.35) ? REDLINE * 0.88 : REDLINE * 0.95;
+    let upshiftThreshold = getUpshiftThreshold(physics, maxCurveAhead);
 
     if (state.shiftCooldown <= 0) {
         state.isDownshifting = false;
 
-        if (state.rpm >= upshiftThreshold && state.currentGear < gearRatios.length - 1 && state.throttle > 0.5) {
+        if (shouldUpshift(state, physics, upshiftThreshold)) {
             state.currentGear++;
-            state.shiftCooldown = getShiftTime(state.currentGear, false);
-            currentGearRatio = getEffectiveGearRatio(state.currentGear);
-        } else if (state.currentGear > 0) {
-            let lowerGearRatio = getEffectiveGearRatio(state.currentGear - 1);
-            let predictedRpmLowerGear = wheelRpmReal * lowerGearRatio * FINAL_DRIVE_RATIO;
-            let isCornerZone = maxCurveAhead > 0.35 || state.brake > 0.2;
-            let desiredCornerRpm = REDLINE * 0.65;
-
-            if (isCornerZone && state.rpm < desiredCornerRpm && predictedRpmLowerGear < REDLINE * 0.92) {
-                state.currentGear--;
-                state.shiftCooldown = getShiftTime(state.currentGear, true);
-                state.isDownshifting = true;
-                currentGearRatio = getEffectiveGearRatio(state.currentGear);
-            } else if (!isCornerZone && state.rpm < REDLINE * 0.40 && state.throttle > 0.8 && predictedRpmLowerGear < REDLINE * 0.90) {
-                state.currentGear--;
-                state.shiftCooldown = getShiftTime(state.currentGear, true);
-                state.isDownshifting = true;
-                currentGearRatio = getEffectiveGearRatio(state.currentGear);
-            }
+            state.shiftCooldown = getShiftTimeForState(state, physics, state.currentGear, false);
+            currentGearRatio = getEffectiveGearRatio(physics, state.currentGear);
+        } else if (shouldDownshiftCorner(state, physics, wheelRpmReal, currentGearRatio, maxCurveAhead)) {
+            state.currentGear--;
+            state.shiftCooldown = getShiftTimeForState(state, physics, state.currentGear, true);
+            state.isDownshifting = true;
+            currentGearRatio = getEffectiveGearRatio(physics, state.currentGear);
+        } else if (shouldDownshiftAccel(state, physics, wheelRpmReal, currentGearRatio)) {
+            state.currentGear--;
+            state.shiftCooldown = getShiftTimeForState(state, physics, state.currentGear, true);
+            state.isDownshifting = true;
+            currentGearRatio = getEffectiveGearRatio(physics, state.currentGear);
         }
     }
 
     let isHittingRevLimiter = false;
+    let mechanicalEngineRpm = calculateMechanicalEngineRpm(physics.speedMs, currentGearRatio, physics.wheelRadius);
     let isClutchSlipping = (state.currentGear === 0 && mechanicalEngineRpm < 1500);
 
     if (state.shiftCooldown > 0) {
-        if (state.isDownshifting) {
-            let targetRevMatch = wheelRpmReal * currentGearRatio * FINAL_DRIVE_RATIO;
-            state.rpm += (targetRevMatch - state.rpm) * Math.min(1, dt * 25);
-        } else {
-            state.rpm -= 4500 * dt;
-        }
+        let targetRevMatch = wheelRpmReal * currentGearRatio * FINAL_DRIVE_RATIO;
+        updateRpmDuringShift(state, dt, targetRevMatch, state.isDownshifting);
     } else if (isClutchSlipping) {
-        let targetSlip = 900 + (state.throttle * 4000);
-        state.rpm += (targetSlip - state.rpm) * Math.min(1, dt * 10);
+        handleClutchSlipping(state, dt, 900 + (state.throttle * 4000));
     } else {
-        state.rpm = mechanicalEngineRpm;
-        if (state.rpm >= REDLINE) {
-            isHittingRevLimiter = true;
-            state.rpm = REDLINE - (Math.random() * 300 + 50);
-        }
+        syncRpmToWheels(state, physics, mechanicalEngineRpm);
+        isHittingRevLimiter = handleRevLimiter(state, physics);
     }
 
-    state.rpm = Math.max(900, Math.min(REDLINE, state.rpm));
+    state.rpm = Math.max(900, Math.min(physics.REDLINE, state.rpm));
 
-    let powerDelivery = (state.shiftCooldown > 0 || isHittingRevLimiter) ? 0.0 : 1.0;
-    let rpmPeak = REDLINE * 0.6;
-    let rpmSpread = REDLINE * 0.4;
-    let rpmDelta = (state.rpm - rpmPeak) / rpmSpread;
-    let torqueFactor = Math.max(0.5, 1 - (rpmDelta * rpmDelta * 0.5));
+    return { currentGearRatio, isHittingRevLimiter };
+}
 
-    let accelStat = state.stats.acceleration / 100;
-    let engineTorque = state.car.torque * torqueFactor * powerDelivery * state.throttle;
-    let wheelForce = (engineTorque * currentGearRatio * FINAL_DRIVE_RATIO * DRIVETRAIN_EFFICIENCY * accelStat) / wheelRadius;
 
-    let forwardAccelMs2 = (wheelForce / state.car.weight) * terrainMult;
-    let forwardAccel = forwardAccelMs2 / INTERNAL_TO_MS;
 
-    let dragForce = 0.5 * 1.225 * cdA * speedMs * speedMs;
-    let dragDecelMs2 = dragForce / state.car.weight;
-    let engineBrakeDecelMs2 = (0.3 + currentGearRatio * 0.1) * (1 - state.throttle);
-    let passiveDecel = (dragDecelMs2 + engineBrakeDecelMs2) / INTERNAL_TO_MS;
-
-    state.speed += forwardAccel * dt;
-    state.speed -= (brakeDecelInternal * state.brake) * dt;
-    state.speed -= passiveDecel * dt;
-    state.speed = Math.max(0.2, state.speed);
-
-    let postSpeedMs = state.speed * INTERNAL_TO_MS;
-    let postWheelRpmReal = (postSpeedMs / (2 * Math.PI * wheelRadius)) * 60;
-    let postMechanicalEngineRpm = postWheelRpmReal * currentGearRatio * FINAL_DRIVE_RATIO;
+function syncPostForceRpm(state, dt, physics, drivetrainData) {
+    let postSpeedMs = state.speed * physics.INTERNAL_TO_MS;
+    let postWheelRpmReal = (postSpeedMs / (2 * Math.PI * physics.wheelRadius)) * 60;
+    let postMechanicalEngineRpm = calculateMechanicalEngineRpm(postSpeedMs, drivetrainData.currentGearRatio, physics.wheelRadius);
 
     if (state.shiftCooldown > 0) {
-        if (state.isDownshifting) {
-            let targetRevMatch = postWheelRpmReal * currentGearRatio * FINAL_DRIVE_RATIO;
-            state.rpm += (targetRevMatch - state.rpm) * Math.min(1, dt * 28);
-        } else {
-            state.rpm = Math.max(postMechanicalEngineRpm * 0.82, state.rpm - 3200 * dt);
-        }
+        let targetRevMatch = postWheelRpmReal * drivetrainData.currentGearRatio * FINAL_DRIVE_RATIO;
+        updateRpmDuringShift(state, dt, targetRevMatch, state.isDownshifting);
     } else if (state.currentGear === 0 && postMechanicalEngineRpm < 1500) {
-        let targetSlip = 900 + (state.throttle * 4000);
-        state.rpm += (targetSlip - state.rpm) * Math.min(1, dt * 12);
+        handleClutchSlipping(state, dt, 900 + (state.throttle * 4000));
     } else {
-        state.rpm = postMechanicalEngineRpm;
-        if (state.rpm >= REDLINE) {
-            state.rpm = REDLINE - (Math.random() * 300 + 50);
+        syncRpmToWheels(state, physics, postMechanicalEngineRpm);
+        if (state.rpm >= physics.REDLINE) {
+            state.rpm = physics.REDLINE - (Math.random() * 300 + 50);
         }
     }
 
-    state.rpm = Math.max(900, Math.min(REDLINE, state.rpm));
+    state.rpm = Math.max(900, Math.min(physics.REDLINE, state.rpm));
+}
 
+function updateProgressAndLap(state, dt) {
     if (typeof state.visualSpeed !== 'number') state.visualSpeed = state.speed;
     let speedDelta = state.speed - state.visualSpeed;
     let speedBlend = Math.min(1, dt * (Math.abs(speedDelta) > 0.6 ? 24 : 16));
@@ -389,4 +334,19 @@ function updateVehicleState(state, dt, draftWindow) {
             state.finalTotalTime = globalRaceTime;
         }
     }
+}
+
+function updateVehicleState(state, dt, draftWindow) {
+    if (state.finished) return;
+
+    state.currentLapTime += dt;
+
+    let physics = buildPhysicsContext(state, dt);
+    let targetData = computeTargetSpeedData(state, physics, draftWindow);
+    applyDriverInputsAndSlip(state, dt, physics, targetData);
+
+    let drivetrainData = updateGearboxAndPreForceRpm(state, dt, physics, targetData.maxCurveAhead);
+    applyLongitudinalForces(state, dt, physics, drivetrainData);
+    syncPostForceRpm(state, dt, physics, drivetrainData);
+    updateProgressAndLap(state, dt);
 }

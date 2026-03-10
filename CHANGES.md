@@ -1,5 +1,135 @@
 # Mudanças Implementadas (Atualizado)
 
+## 3. Reorganização Modular para Expansibilidade 🏗️
+
+**Commit:** `Organize physics modules into domain-specific subdirectories`
+
+**Objetivo:** Estruturar o código físico em domínios especializados para facilitar expansão futura (novos pneus, aero dinâmica, combustível, dano, etc.).
+
+### Estrutura de Diretórios Criada
+
+```
+js/
+├── physics/
+│   ├── tires/
+│   │   ├── model.js              # Pacejka Magic Formula, slip angle, grip
+│   │   └── index.js              # Re-exports
+│   ├── aero/
+│   │   ├── aerodynamics.js       # Downforce, drag, max speed
+│   │   └── index.js              # Re-exports
+│   ├── powertrain/
+│   │   ├── transmission.js       # Gear ratios, RPM, torque, rev limiter
+│   │   ├── gearbox.js            # Shift logic, upshift/downshift
+│   │   └── index.js              # Re-exports
+│   └── forces/
+│       ├── longitudinal.js       # Acceleration, braking, speed integration
+│       └── index.js              # Re-exports
+├── race-physics.js               # Orchestrator principal
+├── race-render.js
+├── race.js
+└── ...
+```
+
+### Funções Separadas por Domínio
+
+#### **Tires (`physics/tires/model.js`)**
+- `calculateSlipAndGrip()` - Cálculo de ângulo de slip e curva de grip Pacejka
+- `detectSlidingAndLocking()` - Deteção de aquaplanagem e travamento de rodas
+- `updateTireSlipAngle()` - Atualização do ângulo de slip
+
+#### **Aerodynamics (`physics/aero/aerodynamics.js`)**
+- `calculateAerodynamicContext()` - Downforce e carga aerodinâmica
+- `calculateDragDeceleration()` - Desaceleração por arrasto
+- `calculateMaxSpeedFromPower()` - Velocidade máxima teórica
+- `getLoadSensitiveGrip()` - Grip sensível à carga (downforce + peso)
+
+#### **Powertrain Transmission (`physics/powertrain/transmission.js`)**
+- `getEffectiveGearRatio()` - Relação de marcha com modificadores
+- `getShiftTimeForState()` - Duração do câmbio
+- `calculateMechanicalEngineRpm()` - RPM mecânico das rodas
+- `handleClutchSlipping()` - Física de embraiagem
+- `handleRevLimiter()` - Limitador de rotação
+- `applyEngineBrake()` - Travagem do motor
+- `calculateTorqueDelivery()` - Entrega de torque do motor
+
+#### **Gearbox Logic (`physics/powertrain/gearbox.js`)**
+- `shouldUpshift()` - Decisão de cambiar para cima
+- `shouldDownshiftCorner()` - Cambiar para baixo em curva
+- `shouldDownshiftAccel()` - Cambiar para baixo em aceleração
+- `updateRpmDuringShift()` - Sincronização RPM durante câmbio
+- `syncRpmToWheels()` - Sincronização RPM pós-câmbio
+- `getUpshiftThreshold()` - Limite de cambiar (contexto-dependente)
+
+#### **Forces Longitudinal (`physics/forces/longitudinal.js`)**
+- `applyLongitudinalForces()` - Integração completa de forças (aceleração, travagem, arrasto)
+- `calculateWheelForceFromTorque()` - Conversão torque → força roda
+- `applyBrakingForce()` - Aplicação de travagem
+- `applyDragAndBraking()` - Arrasto e travagem do motor
+- `clampSpeed()` - Limitador de velocidade mínima
+
+### Refatoração de `js/race-physics.js`
+
+**Antes:** Todas as funções inline em `race-physics.js`
+
+**Depois:** Importação modular + chamadas através de funções especializadas
+
+```javascript
+// Exemplo: buildPhysicsContext() agora chama funções aero
+let aeroContext = calculateAerodynamicContext(state, state.car, { speedMs });
+let actualGrip = getLoadSensitiveGrip(baseGrip, aeroContext.aeroLoadFactor, terrainMult);
+
+// Exemplo: applyDriverInputsAndSlip() agora chama módulo de pneus
+let slipData = calculateSlipAndGrip(state, physics, currCurvature);
+let tireData = detectSlidingAndLocking(state, physics, slipData, currCurvature);
+
+// Exemplo: updateGearboxAndPreForceRpm() agora chama módulos de powertrain
+if (shouldUpshift(state, physics, upshiftThreshold)) { /* ... */ }
+if (shouldDownshiftCorner(state, physics, wheelRpmReal, ...)) { /* ... */ }
+```
+
+### Script Loading Order (index.html)
+
+```html
+<!-- Ordem de carregamento otimizada -->
+<script src="data.js"></script>
+<script src="js/state.js"></script>
+<script src="save.js"></script>
+<script src="js/utils.js"></script>
+<script src="js/garage.js"></script>
+
+<!-- Physics Domain Modules (em ordem de dependência) -->
+<script src="js/physics/tires/model.js"></script>
+<script src="js/physics/aero/aerodynamics.js"></script>
+<script src="js/physics/powertrain/transmission.js"></script>
+<script src="js/physics/powertrain/gearbox.js"></script>
+<script src="js/physics/forces/longitudinal.js"></script>
+
+<!-- Core Simulation & Rendering -->
+<script src="js/race-physics.js"></script>
+<script src="js/race-render.js"></script>
+<script src="js/race.js"></script>
+<script src="engine.js"></script>
+```
+
+### Benefícios para Expansibilidade
+
+1. **Novos Pneus:** Implementar novo modelo em `tires/alternative-model.js` sem tocar resto
+2. **Clima:** Adicionar `physics/weather/conditions.js` com multiplicadores de grip
+3. **Combustível:** Criar `physics/fuel/consumption.js` com lógica de peso dinâmico
+4. **Dano:** Adicionar `physics/damage/degradation.js` com perda de performance
+5. **Suspensão:** Implementar `physics/suspension/tuning.js` para altura e rigidez
+6. **IA Diferente:** Cada piloto pode ter seus próprios `computeTargetSpeedData()` customizado
+
+### Validação
+
+- ✅ Nenhum erro de sintaxe detectado
+- ✅ Todas as funções transferidas mantêm assinatura original
+- ✅ API externa de `race-physics.js` não muda
+- ✅ Comportamento físico preservado (apenas reorganização de código)
+- ✅ Script loading order sem dependências circulares
+
+---
+
 ## 1. Botão Skip Simulation ⏭️
 
 **Ficheiro:** `index.html` e `engine.js`
