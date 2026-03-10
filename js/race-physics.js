@@ -299,7 +299,20 @@ function syncPostForceRpm(state, dt, physics, drivetrainData) {
     } else if (state.currentGear === 0 && postMechanicalEngineRpm < 1500) {
         handleClutchSlipping(state, dt, 900 + (state.throttle * 4000));
     } else {
-        syncRpmToWheels(state, physics, postMechanicalEngineRpm);
+        // Smoother RPM sync with braking consideration
+        let brakingIntensity = Math.min(1.0, state.brake);
+        
+        // When braking, RPM descends more naturally (less abrupt)
+        if (brakingIntensity > 0.2) {
+            // Gradual RPM descent during braking (realistic engine braking feel)
+            let targetRpmOnBrake = postMechanicalEngineRpm * (0.85 + brakingIntensity * 0.15);
+            let brakeSyncSpeed = 18 + (brakingIntensity * 12); // Faster sync during heavy braking
+            state.rpm += (targetRpmOnBrake - state.rpm) * Math.min(1, dt * brakeSyncSpeed);
+        } else {
+            // Normal throttle-off sync
+            syncRpmToWheels(state, physics, postMechanicalEngineRpm);
+        }
+        
         if (state.rpm >= physics.REDLINE) {
             state.rpm = physics.REDLINE - (Math.random() * 300 + 50);
         }

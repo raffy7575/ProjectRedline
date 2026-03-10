@@ -41,7 +41,18 @@ function handleRevLimiter(state, physics) {
 }
 
 function applyEngineBrake(state, physics, currentGearRatio) {
-    let engineBrakeDecelMs2 = (0.3 + currentGearRatio * 0.1) * (1 - state.throttle);
+    // Engine braking is directly related to gear ratio (higher gear = less braking)
+    // When braking, engine braking effect is amplified for more realistic downshift feel
+    let baseBrake = (0.3 + currentGearRatio * 0.1);
+    let throttleEffect = (1 - state.throttle);
+    
+    // When in gear and braking (no throttle), engine provides strong braking
+    let engineBrakeDecelMs2 = baseBrake * throttleEffect;
+    
+    // Apply wheel speed consideration - more effective at lower speeds
+    let speedEffect = Math.max(0.6, 1.0 - (physics.speedMs / 50));
+    engineBrakeDecelMs2 *= speedEffect;
+    
     return engineBrakeDecelMs2 / physics.INTERNAL_TO_MS;
 }
 
