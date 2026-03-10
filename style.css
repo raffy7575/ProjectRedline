@@ -1,0 +1,285 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #161616; color: #bbb;
+    padding: 20px; max-width: 950px; margin: 0 auto;
+}
+
+.hud {
+    display: flex; justify-content: space-between; background-color: #222;
+    padding: 15px; border-radius: 4px; margin-bottom: 20px; font-weight: bold; border-left: 4px solid #4CAF50;
+    align-items: center;
+}
+.money { color: #8BC34A; }
+
+h1 { margin-bottom: 20px; color: #fff; }
+
+.nav-tabs { display: flex; gap: 5px; margin-bottom: 10px; }
+.tab-btn {
+    background-color: #222; color: #888; padding: 12px 20px; border: 1px solid #333;
+    border-bottom: none; border-radius: 4px 4px 0 0; cursor: pointer; font-weight: bold; flex: 1;
+}
+.tab-btn:hover { background-color: #2a2a2a; color: #fff; }
+.tab-btn.active { background-color: #333; color: #8BC34A; border-color: #4CAF50; border-bottom: 3px solid #161616; }
+
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+
+.panel { background-color: #222; padding: 20px; border-radius: 4px; border: 1px solid #333; }
+
+.track-event-box {
+    background-color: #111; border: 1px solid #4CAF50; border-left: 4px solid #4CAF50;
+    padding: 15px; border-radius: 4px; color: #fff; font-size: 1.1em; font-weight: bold;
+}
+
+button {
+    width: 100%; padding: 12px; background-color: #333; color: white;
+    border: 1px solid #444; border-radius: 4px; cursor: pointer; font-weight: bold;
+}
+button.action-btn { background-color: #4CAF50; transition: 0.2s; border: none; }
+button.action-btn:hover { background-color: #45a049; }
+button:disabled { background-color: #555; color: #888; cursor: not-allowed; }
+
+.car-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px; }
+.car-card { background-color: #2a2a2a; border: 1px solid #444; border-radius: 4px; padding: 15px; position: relative; }
+.car-card.owned { cursor: pointer; }
+.car-card.owned:hover { border-color: #666; }
+.car-card.selected { border-color: #8BC34A; background-color: #333; }
+.car-name { font-size: 1.2em; font-weight: bold; color: #fff; margin-bottom: 10px; border-bottom: 1px solid #444; padding-bottom: 5px; }
+.stat-label { display: flex; justify-content: space-between; margin-bottom: 3px; font-size: 0.8em; }
+.stat-bar-bg { width: 100%; height: 6px; background-color: #111; border-radius: 3px; overflow: hidden; margin-bottom: 10px; border: 1px solid #333; }
+.stat-bar-fill { height: 100%; background-color: #8BC34A; }
+.stat-bar-fill.upgrade { background-color: #FFC107; } 
+
+.buy-overlay { margin-top: 15px; }
+.buy-btn { background-color: #03A9F4; border: none; }
+.buy-btn:hover { background-color: #0288D1; }
+
+#race-layout { display: grid; grid-template-columns: 250px 1fr; gap: 15px; }
+.sidebar { background-color: #222; border: 1px solid #333; border-radius: 4px; padding: 15px; }
+.sidebar-header { font-weight: bold; color: #fff; margin-bottom: 15px; border-bottom: 1px solid #444; padding-bottom: 5px; }
+.main-race-area { display: flex; flex-direction: column; gap: 10px; }
+.race-header { background-color: #333; color: #fff; font-weight: bold; padding: 10px 15px; border-radius: 4px; border: 1px solid #444; }
+
+.map-container { position: relative; background-color: #111; border: 1px solid #333; border-radius: 4px; overflow: hidden; }
+#race-track { width: 100%; display: block; background-image: radial-gradient(circle, #2a2a2a 0%, #111 100%); }
+.map-overlay {
+    position: absolute; bottom: 0; left: 0; width: 100%; background: rgba(0,0,0,0.8);
+    padding: 8px 15px; display: flex; justify-content: space-between; font-size: 0.85em; box-sizing: border-box; border-top: 1px solid #444;
+}
+
+.live-leaderboard { display: flex; flex-direction: column; border: 1px solid #2e2e2e; border-radius: 4px; overflow: hidden; box-shadow: 0 2px 12px rgba(0,0,0,0.4); }
+
+.leaderboard-row {
+    display: grid;
+    grid-template-columns: 5px 1fr 62px 1fr 108px 82px;
+    background-color: #1e1e1e;
+    border-bottom: 1px solid #2a2a2a;
+    align-items: stretch;
+    transition: background-color 0.15s;
+}
+.leaderboard-row:last-child { border-bottom: none; }
+
+.row-color { width: 100%; }
+
+.row-name {
+    padding: 11px 10px 11px 14px;
+    color: #ccc;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9em;
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.you-badge {
+    background-color: #4CAF50;
+    color: #000;
+    font-size: 0.62em;
+    font-weight: 800;
+    padding: 2px 6px;
+    border-radius: 2px;
+    letter-spacing: 0.8px;
+    flex-shrink: 0;
+    text-transform: uppercase;
+}
+
+/* ── Gear badge ─────────────────────────────────── */
+.gear-badge {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: #111;
+    border-left: 1px solid #2e2e2e;
+    border-right: 1px solid #2e2e2e;
+    padding: 6px 2px;
+    gap: 0px;
+    cursor: default;
+}
+.gear-label {
+    font-size: 0.52em;
+    color: #555;
+    text-transform: uppercase;
+    letter-spacing: 1.8px;
+    font-weight: 700;
+    line-height: 1;
+    margin-bottom: 1px;
+}
+.gear-num {
+    font-size: 2.1em;
+    font-weight: 900;
+    font-family: 'Courier New', monospace;
+    line-height: 1;
+}
+
+/* ── RPM column ─────────────────────────────────── */
+.row-rpm {
+    padding: 8px 14px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 5px;
+}
+.rpm-bar-bg {
+    width: 100%;
+    height: 10px;
+    background-color: #0d0d0d;
+    border-radius: 4px;
+    overflow: hidden;
+    border: 1px solid #2a2a2a;
+    position: relative;
+}
+.rpm-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #4CAF50 0%, #8BC34A 35%, #FFC107 68%, #f44336 100%);
+    transition: width 0.08s linear;
+    border-radius: 3px;
+}
+.rpm-readout {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    line-height: 1;
+}
+.rpm-text {
+    font-family: 'Courier New', monospace;
+    font-size: 0.82em;
+    font-weight: 700;
+    color: #FFC107;
+    letter-spacing: 0.3px;
+}
+.speed-text {
+    font-family: 'Courier New', monospace;
+    font-size: 0.78em;
+    color: #666;
+    letter-spacing: 0.3px;
+}
+
+/* ── Timer & position ───────────────────────────── */
+.row-timer {
+    padding: 11px 10px;
+    text-align: right;
+    color: #e0c040;
+    font-family: 'Courier New', monospace;
+    font-size: 0.98em;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    border-left: 1px solid #282828;
+}
+.row-pct {
+    padding: 11px 12px 11px 6px;
+    text-align: right;
+    color: #bbb;
+    font-family: 'Courier New', monospace;
+    font-size: 0.9em;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+}
+.is-player { background-color: #1b2b1b; }
+.is-player .row-name { color: #fff; font-weight: 700; }
+.is-player .gear-badge { background-color: #0f1a0f; }
+
+.earnings-box { margin-top: 20px; padding: 15px; background-color: #111; border-radius: 4px; text-align: center; border: 1px solid #333; }
+
+.shop-category { margin-top: 25px; border: 1px solid #333; border-radius: 4px; overflow: hidden; }
+.shop-cat-title { background-color: #333; color: #fff; padding: 10px 15px; font-weight: bold; }
+.shop-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background-color: #333; }
+.shop-item { background-color: #222; padding: 15px; display: flex; justify-content: space-between; align-items: center; }
+.item-info h4 { margin: 0 0 5px 0; color: #fff; }
+.item-info p { margin: 0; font-size: 0.85em; color: #8BC34A; }
+.item-buy { width: 120px; }
+
+.skill-grid { display: grid; grid-template-columns: 1fr; gap: 15px; }
+.skill-card { background-color: #2a2a2a; border: 1px solid #444; border-radius: 4px; padding: 15px; display: flex; justify-content: space-between; align-items: center; }
+.skill-info h3 { margin: 0 0 5px 0; color: #fff; }
+.skill-info p { margin: 0 0 5px 0; color: #888; font-size: 0.9em; }
+.skill-info .effect { color: #03A9F4; font-weight: bold; font-size: 0.85em; }
+.skill-level { font-size: 1.5em; font-weight: bold; color: #4CAF50; width: 60px; text-align: center; border-right: 1px solid #444; margin-right: 15px; }
+.skill-action { display: flex; align-items: center; }
+.skill-buy { width: 140px; }
+
+/* Modal para nome do jogador */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.9);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.name-modal {
+    background-color: #222;
+    border: 2px solid #4CAF50;
+    border-radius: 8px;
+    padding: 40px;
+    text-align: center;
+    max-width: 400px;
+    box-shadow: 0 0 30px rgba(76, 175, 80, 0.3);
+}
+
+.name-modal h2 {
+    color: #fff;
+    margin-bottom: 15px;
+    font-size: 1.8em;
+}
+
+.name-modal p {
+    color: #bbb;
+    margin-bottom: 25px;
+    font-size: 0.95em;
+}
+
+#driver-name-input {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 20px;
+    background-color: #111;
+    border: 1px solid #444;
+    border-radius: 4px;
+    color: #fff;
+    font-size: 1em;
+    box-sizing: border-box;
+}
+
+#driver-name-input:focus {
+    outline: none;
+    border-color: #4CAF50;
+    box-shadow: 0 0 10px rgba(76, 175, 80, 0.2);
+}
+
+#driver-name-input::placeholder {
+    color: #666;
+}
+
+.name-modal .action-btn {
+    width: 100%;
+}

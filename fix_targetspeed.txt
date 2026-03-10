@@ -1,0 +1,15 @@
+Fix for targetSpeed in retas:
+
+OLD (line 516-517):
+        let targetSpeedFromCurve = maxPossibleSpeed * corneringLimit;
+        // Sem limite artificial por mudança — deixar carros atingirem max teórico
+        let targetSpeed = targetSpeedFromCurve;
+
+NEW:
+        let targetSpeedFromCurve = maxPossibleSpeed * corneringLimit;
+        let targetSpeed = targetSpeedFromCurve;
+        
+        // EM RETAS: remover limitação de curva, deixar carro ACELERAR A FUNDO
+        if (maxCurveAhead < 0.2) {
+            targetSpeed = maxPossibleSpeed;
+        }
