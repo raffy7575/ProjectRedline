@@ -28,14 +28,6 @@
         </div>
     </div>
 
-    <div class="hud">
-        <div>Player: <span id="player-name" style="color: #fff;">Driver</span></div>
-        <div style="display: flex; gap: 20px; align-items: center;">
-            <div>Bank: <span class="money">$<span id="player-money">0</span></span></div>
-            <button onclick="showResetModal()" style="width: auto; padding: 8px 15px; background-color: #555; font-size: 0.85em;">Reset Progress</button>
-        </div>
-    </div>
-
     <h1>Street Racing League</h1>
     
     <div class="nav-tabs">
@@ -47,19 +39,30 @@
 
     <div id="tab-garage" class="tab-content active">
         
-        <div class="panel" id="selection-panel">
-            <h2>Career Mode</h2>
-            <div id="career-mode" class="career-mode-panel">
-                Loading League...
+        <div class="dashboard-grid" id="selection-panel">
+            <div class="dash-column left-col">
+                <div class="player-profile-card">
+                    <div class="profile-info">
+                        <div class="profile-name" id="player-name">Driver</div>
+                        <div class="profile-bank">$<span id="player-money">0</span></div>
+                    </div>
+                    <button onclick="showResetModal()" class="reset-icon-btn" title="Reset Progress">🔄</button>
+                </div>
+
+                <h2>My Garage</h2>
+                <div id="owned-car-grid" class="car-grid compact-grid"></div>
+                <div id="maintenance-panel" class="maintenance-panel"></div>
             </div>
 
-            <h2 style="margin-top: 20px;">My Cars</h2>
-            <p style="color: #888; font-size: 0.9em; margin-bottom: 10px;">Select a car to race. Head to the <strong style="color:#8BC34A;">Dealership</strong> tab to buy new cars.</p>
+            <div class="dash-column middle-col">
+                <h2>Championship</h2>
+                <div id="career-standings-panel" class="scrollable-area"></div>
+            </div>
 
-            <div id="owned-car-grid" class="car-grid"></div>
-
-            <div id="maintenance-panel" class="maintenance-panel" style="display: none;"></div>
-            
+            <div class="dash-column right-col">
+                <h2>League Events</h2>
+                <div id="career-events-panel" class="scrollable-area"></div>
+            </div>
         </div>
 
         <div id="race-layout" style="display: none;">

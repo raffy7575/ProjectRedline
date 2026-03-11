@@ -341,11 +341,13 @@ function buildRivalIntelHTML(activeLeague) {
 function renderCareerMode() {
     ensureCareerProgress();
 
-    let container = document.getElementById('career-mode');
-    if (!container) return;
+    let standingsContainer = document.getElementById('career-standings-panel');
+    let eventsContainer = document.getElementById('career-events-panel');
+    if (!standingsContainer || !eventsContainer) return;
 
     if (!Array.isArray(leagues) || !leagues.length) {
-        container.innerHTML = '<div class="career-empty">No leagues available.</div>';
+        standingsContainer.innerHTML = '<div class="career-empty">No leagues available.</div>';
+        eventsContainer.innerHTML = '';
         return;
     }
 
@@ -445,7 +447,9 @@ function renderCareerMode() {
     let activeLeague = getActiveLeague();
     let standingsHTML = buildStandingsTableHTML(activeLeague);
     let rivalIntelHTML = buildRivalIntelHTML(activeLeague);
-    container.innerHTML = `${standingsHTML}${rivalIntelHTML}${leaguesHTML}`;
+
+    if (standingsContainer) standingsContainer.innerHTML = `${standingsHTML}${rivalIntelHTML}`;
+    if (eventsContainer) eventsContainer.innerHTML = leaguesHTML;
 }
 
 function buildGarage() {
