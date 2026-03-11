@@ -18,7 +18,7 @@
     ============================================================================= */
 
 const customTrackImg = new Image();
-customTrackImg.src = 'assets/Gemini_Generated_Image_mr00xzmr00xzmr00.png';
+customTrackImg.src = 'assets/serpent.png';
 const SHOW_NEON_TRACK_PATH = true;
 let neonPathCacheCanvas = null;
 let neonPathCacheKey = '';
