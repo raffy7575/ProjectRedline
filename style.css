@@ -26,6 +26,11 @@ h1 { margin-bottom: 20px; color: #fff; }
     border-color: #2a2a2a;
     position: relative;
 }
+.tab-btn.disabled {
+    color: #555;
+    cursor: not-allowed;
+    border-color: #2a2a2a;
+}
 .tab-btn.tab-locked:hover {
     background-color: #222;
     color: #666;

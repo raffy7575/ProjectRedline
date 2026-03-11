@@ -30,7 +30,7 @@ function hideRaceStartOverlay() {
 
 function applyWearAndTearFromRace(playerRaceState) {
     // Feature gate: wear is locked until Class B (tier 3)
-    if (typeof isFeatureUnlocked === 'function' && !isFeatureUnlocked('wearAndTear')) return null;
+    if (typeof isFeatureUnlocked === 'function' && !isFeatureUnlocked('maintenance')) return null;
 
     if (!selectedPlayerCar || !playerRaceState) return null;
 

@@ -62,33 +62,56 @@ function ensureCareerProgress() {
 // Class C immediately opens its features even before finishing it.
 
 const FEATURE_REQUIREMENTS = {
-    tuningShop:     2,
-    aiUpgrades:     2,
-    wearAndTear:    3,
-    rivalIntel:     3,
-    specialOffers:  4
+    tuning:        2,
+    ai_upgrades:   2,
+    maintenance:   3,
+    rival_intel:   3,
+    specialOffers: 4
 };
 
-function getHighestUnlockedLeagueTier() {
-    ensureCareerProgress();
+function getHighestUnlockedTier() {
+    let progress = ensureCareerProgress();
+    let unlockedLeagueIds = Array.isArray(progress.unlockedLeagueIds) ? progress.unlockedLeagueIds : [];
     let maxTier = 1;
-    leagues.forEach(league => {
-        if (isLeagueUnlocked(league.id)) {
-            let t = Number(league.tier) || 1;
-            if (t > maxTier) maxTier = t;
-        }
+
+    unlockedLeagueIds.forEach(leagueId => {
+        let league = Array.isArray(leagues) ? leagues.find(item => item.id === leagueId) : null;
+        if (!league) return;
+        let tier = Number(league.tier) || 1;
+        if (tier > maxTier) maxTier = tier;
     });
+
     return maxTier;
 }
 
+function getHighestUnlockedLeagueTier() {
+    return getHighestUnlockedTier();
+}
+
 function isFeatureUnlocked(featureName) {
-    let required = FEATURE_REQUIREMENTS[featureName];
+    const aliases = {
+        tuningShop: 'tuning',
+        aiUpgrades: 'ai_upgrades',
+        wearAndTear: 'maintenance',
+        rivalIntel: 'rival_intel'
+    };
+
+    let normalizedName = aliases[featureName] || featureName;
+    let required = FEATURE_REQUIREMENTS[normalizedName];
     if (!Number.isFinite(required)) return true;
-    return getHighestUnlockedLeagueTier() >= required;
+    return getHighestUnlockedTier() >= required;
 }
 
 function getFeatureUnlockLabel(featureName) {
-    let required = FEATURE_REQUIREMENTS[featureName];
+    const aliases = {
+        tuningShop: 'tuning',
+        aiUpgrades: 'ai_upgrades',
+        wearAndTear: 'maintenance',
+        rivalIntel: 'rival_intel'
+    };
+
+    let normalizedName = aliases[featureName] || featureName;
+    let required = FEATURE_REQUIREMENTS[normalizedName];
     if (!Number.isFinite(required)) return '';
     let league = leagues.find(l => (Number(l.tier) || 1) === required);
     return league ? `Unlocks at ${league.class}` : `Tier ${required} required`;

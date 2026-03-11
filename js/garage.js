@@ -11,7 +11,11 @@ function completeInitialization() {
 }
 
 function openTab(tabId, btn) {
-    // Gate: block locked tabs and show a tooltip instead
+    // Gate: block locked tabs with explicit user feedback
+    if (tabId === 'tab-tuning' && typeof isFeatureUnlocked === 'function' && !isFeatureUnlocked('tuning')) {
+        alert('Tuning Shop unlocks at Semi-Pro League (Class C)');
+        return;
+    }
     if (btn && btn.classList.contains('tab-locked')) return;
 
     document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
@@ -24,15 +28,17 @@ function openTab(tabId, btn) {
 
 function updateTabGates() {
     let tuningBtn = document.getElementById('tab-btn-tuning');
-    let tuningUnlocked = isFeatureUnlocked('tuningShop');
+    let tuningUnlocked = isFeatureUnlocked('tuning');
     if (tuningBtn) {
         if (tuningUnlocked) {
             tuningBtn.classList.remove('tab-locked');
+            tuningBtn.classList.remove('disabled');
             tuningBtn.title = '';
             tuningBtn.textContent = 'Tuning Shop';
         } else {
             tuningBtn.classList.add('tab-locked');
-            tuningBtn.title = getFeatureUnlockLabel('tuningShop');
+            tuningBtn.classList.add('disabled');
+            tuningBtn.title = 'Tuning Shop unlocks at Semi-Pro League (Class C)';
             tuningBtn.textContent = '🔒 Tuning Shop';
             // If currently on tuning tab, bounce back to garage
             if (document.getElementById('tab-tuning').classList.contains('active')) {
@@ -140,7 +146,7 @@ function buildMaintenancePanel() {
     if (!panel) return;
 
     // Feature gate: hide entirely if Wear & Tear is not yet unlocked
-    if (!isFeatureUnlocked('wearAndTear')) {
+    if (!isFeatureUnlocked('maintenance')) {
         panel.style.display = 'none';
         panel.innerHTML = '';
         return;
@@ -284,7 +290,7 @@ function buildRivalIntelHTML(activeLeague) {
     if (!activeLeague || typeof getAiUpgradeFeedForLeague !== 'function') return '';
 
     // Feature gate: hide Rival Intel until Class B
-    if (!isFeatureUnlocked('rivalIntel')) return '';
+    if (!isFeatureUnlocked('rival_intel')) return '';
 
     let feed = getAiUpgradeFeedForLeague(activeLeague.id);
 
@@ -480,6 +486,13 @@ function buildGarage() {
     }
 
     renderCareerMode();
+    updateTabGates();
+
+    let maintenancePanel = document.getElementById('maintenance-panel');
+    if (maintenancePanel && !isFeatureUnlocked('maintenance')) {
+        maintenancePanel.style.display = 'none';
+        maintenancePanel.innerHTML = '';
+    }
 }
 
 function buyCar(carId, price) {

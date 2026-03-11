@@ -261,9 +261,6 @@ function getNextEventInLeague(leagueId, eventId) {
 }
 
 function advanceAiAfterEvent(leagueId, eventId) {
-    // Feature gate: AI upgrading is locked until Class C (tier 2)
-    if (typeof isFeatureUnlocked === 'function' && !isFeatureUnlocked('aiUpgrades')) return [];
-
     let aiState = initializeAiCareerState();
     let league = leagues.find(x => x.id === leagueId);
     if (!league) return [];
@@ -275,6 +272,13 @@ function advanceAiAfterEvent(leagueId, eventId) {
 
     let currentIndex = Math.max(0, league.events.findIndex(e => e.id === eventId));
     applyAiIncomeForEvent(leagueId, currentIndex);
+
+    // Feature gate: AI can save money before unlock, but buys nothing.
+    if (typeof isFeatureUnlocked === 'function' && !isFeatureUnlocked('ai_upgrades')) {
+        aiState.eventUpgradeFeed[eventId] = [];
+        aiState.lastProcessedEventId = eventId;
+        return [];
+    }
 
     let targetEvent = getNextEventInLeague(leagueId, eventId);
     let upgradeFeed = [];
