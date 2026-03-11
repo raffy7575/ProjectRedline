@@ -485,43 +485,14 @@ function buildRpmSegmentsMarkup(redline, rpm) {
 function createLeaderboardRow(state, statusDisplay) {
     let row = document.createElement('div');
     row.className = `leaderboard-row ${state.isPlayer ? 'is-player' : ''}`;
-    let uiRpm = typeof state.displayRpm === 'number' ? state.displayRpm : state.rpm;
-    let redline = state.car.redline || 8000;
-    let rpmPercent = Math.min(100, (uiRpm / redline) * 100);
-    let gearDisplay = state.currentGear + 1;
     let speedKmh = Math.round(state.speed * PROGRESS_SCALE * METERS_PER_PROGRESS_STEP * 3.6);
-    let gearColor = gearDisplay <= 2 ? '#FF7043' : gearDisplay <= 4 ? '#FFC107' : '#8BC34A';
     let youBadge = state.isPlayer ? '<span class="you-badge">YOU</span>' : '';
     let tunedBadge = (!state.isPlayer && state.isTuned) ? '<span class="tuned-badge">TUNED</span>' : '';
-    let redlineIntensity = rpmPercent > 88 ? ((rpmPercent - 88) / 12 * 0.9).toFixed(2) : '0';
-    let shiftLightActive = rpmPercent >= 92;
-    let redlineGlow = `box-shadow: inset 0 0 10px rgba(244,67,54,${redlineIntensity});`;
 
     row.innerHTML = `
         <div class="row-color" style="background-color: ${state.car.color}"></div>
         <div class="row-name">${state.car.name}${youBadge}${tunedBadge}</div>
-        <div class="row-dashboard">
-            <div class="dashboard-gear-panel">
-                <span class="gear-label">gear</span>
-                <span class="gear-num" style="color:${gearColor}">${gearDisplay}</span>
-            </div>
-            <div class="dashboard-main-panel">
-                <div class="rpm-topline">
-                    <div class="shift-light ${shiftLightActive ? 'active' : ''}"></div>
-                    <div class="dashboard-speed-badge">${speedKmh}<span>km/h</span></div>
-                </div>
-                <div class="rpm-bar-bg ${shiftLightActive ? 'is-blinking' : ''}" style="${redlineGlow}">
-                    <div class="rpm-segments">${buildRpmSegmentsMarkup(redline, uiRpm)}</div>
-                    <div class="rpm-guide-lines">${buildRpmGuideLinesMarkup(redline)}</div>
-                </div>
-                <div class="rpm-meta-row">
-                    <div class="rpm-scale">${buildRpmScaleMarkup(redline)}</div>
-                    <div class="rpm-readout">
-                        <span class="rpm-text">${Math.round(uiRpm).toLocaleString()} rpm</span>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <div class="row-speed">${speedKmh}<span>km/h</span></div>
         <div class="row-timer">${formatLapTime(state.currentLapTime)}</div>
         <div class="row-pct">${statusDisplay}</div>
     `;
@@ -529,10 +500,52 @@ function createLeaderboardRow(state, statusDisplay) {
     return row;
 }
 
+function createPlayerRpmDashboardMarkup(state) {
+    let uiRpm = typeof state.displayRpm === 'number' ? state.displayRpm : state.rpm;
+    let redline = state.car.redline || 8000;
+    let rpmPercent = Math.min(100, (uiRpm / redline) * 100);
+    let gearDisplay = state.currentGear + 1;
+    let speedKmh = Math.round(state.speed * PROGRESS_SCALE * METERS_PER_PROGRESS_STEP * 3.6);
+    let gearColor = gearDisplay <= 2 ? '#FF7043' : gearDisplay <= 4 ? '#FFC107' : '#8BC34A';
+    let redlineIntensity = rpmPercent > 88 ? ((rpmPercent - 88) / 12 * 0.9).toFixed(2) : '0';
+    let shiftLightActive = rpmPercent >= 92;
+    let redlineGlow = `box-shadow: inset 0 0 10px rgba(244,67,54,${redlineIntensity});`;
+
+    return `
+        <div class="player-rpm-card">
+            <div class="player-rpm-title">Player RPM Dashboard</div>
+            <div class="player-rpm-layout">
+                <div class="player-gear-panel">
+                    <span class="gear-label">gear</span>
+                    <span class="gear-num" style="color:${gearColor}">${gearDisplay}</span>
+                </div>
+                <div class="player-rpm-main">
+                    <div class="rpm-topline">
+                        <div class="shift-light ${shiftLightActive ? 'active' : ''}"></div>
+                        <div class="dashboard-speed-badge">${speedKmh}<span>km/h</span></div>
+                    </div>
+                    <div class="rpm-bar-bg ${shiftLightActive ? 'is-blinking' : ''}" style="${redlineGlow}">
+                        <div class="rpm-segments">${buildRpmSegmentsMarkup(redline, uiRpm)}</div>
+                        <div class="rpm-guide-lines">${buildRpmGuideLinesMarkup(redline)}</div>
+                    </div>
+                    <div class="rpm-meta-row">
+                        <div class="rpm-scale">${buildRpmScaleMarkup(redline)}</div>
+                        <div class="rpm-readout">
+                            <span class="rpm-text">${Math.round(uiRpm).toLocaleString()} rpm</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
 function updateLiveUI(sortedRacers) {
     const list = document.getElementById('live-leaderboard');
+    const playerRpmDashboard = document.getElementById('player-rpm-dashboard');
     if (!list) return;
     list.innerHTML = '';
+    if (playerRpmDashboard) playerRpmDashboard.innerHTML = '';
 
     let totalRaceLength = trackPath.length * currentTrack.laps;
 
@@ -548,6 +561,10 @@ function updateLiveUI(sortedRacers) {
             document.getElementById('live-lap').innerText = `${state.lap}/${currentTrack.laps}`;
             document.getElementById('live-last-lap').innerText = lastLapDisplay;
             document.getElementById('live-completion').innerText = completionDisplay;
+
+            if (playerRpmDashboard) {
+                playerRpmDashboard.innerHTML = createPlayerRpmDashboardMarkup(state);
+            }
         }
 
         let statusDisplay = state.finished ? formatLapTime(state.finalTotalTime) : `${pct}%`;

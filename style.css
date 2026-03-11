@@ -18,7 +18,7 @@ body {
 }
 .money { color: #8BC34A; }
 
-h1 { margin-bottom: 20px; color: #fff; }
+h1 { margin: 0 0 20px 0; color: #fff; }
 
 .nav-tabs { display: flex; gap: 5px; margin-bottom: 10px; }
 
@@ -70,7 +70,8 @@ h1 { margin-bottom: 20px; color: #fff; }
 .tab-content {
     display: none;
     flex: 1;
-    overflow-y: auto;
+    overflow: hidden;
+    min-height: 0;
     padding-right: 10px;
 }
 
@@ -98,8 +99,13 @@ h1 { margin-bottom: 20px; color: #fff; }
     display: grid;
     grid-template-columns: 320px 360px 1fr;
     gap: 20px;
-    height: calc(100vh - 120px);
+    height: 100%;
+    min-height: 0;
     align-items: stretch;
+}
+
+#race-layout.dashboard-grid {
+    grid-template-columns: 280px 1fr 350px;
 }
 
 .dash-column {
@@ -110,6 +116,7 @@ h1 { margin-bottom: 20px; color: #fff; }
     display: flex;
     flex-direction: column;
     overflow: hidden;
+    min-height: 0;
 }
 
 .dash-column h2 {
@@ -801,7 +808,7 @@ button:disabled { background-color: #555; color: #888; cursor: not-allowed; }
 .buy-btn { background-color: #03A9F4; border: none; }
 .buy-btn:hover { background-color: #0288D1; }
 
-#race-layout { display: grid; grid-template-columns: 250px 1fr; gap: 15px; }
+#race-layout { gap: 15px; min-height: 0; }
 .sidebar { background-color: #222; border: 1px solid #333; border-radius: 4px; padding: 15px; }
 .sidebar-header { font-weight: bold; color: #fff; margin-bottom: 15px; border-bottom: 1px solid #444; padding-bottom: 5px; }
 .main-race-area { display: flex; flex-direction: column; gap: 10px; }
@@ -857,12 +864,26 @@ button:disabled { background-color: #555; color: #888; cursor: not-allowed; }
 
 .live-leaderboard { display: flex; flex-direction: column; border: 1px solid #2e2e2e; border-radius: 4px; overflow: hidden; box-shadow: 0 2px 12px rgba(0,0,0,0.4); }
 
+#race-layout .dash-column {
+    min-height: 0;
+}
+
+#race-layout .right-col {
+    min-height: 0;
+}
+
+#race-layout .live-leaderboard {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+}
+
 .leaderboard-row {
     display: grid;
-    grid-template-columns: 5px minmax(120px, 1fr) minmax(250px, 340px) 108px 82px;
+    grid-template-columns: 5px minmax(100px, 1fr) 88px 90px 72px;
     background-color: #1e1e1e;
     border-bottom: 1px solid #2a2a2a;
-    align-items: stretch;
+    align-items: center;
     transition: background-color 0.15s;
 }
 .leaderboard-row:last-child { border-bottom: none; }
@@ -870,12 +891,12 @@ button:disabled { background-color: #555; color: #888; cursor: not-allowed; }
 .row-color { width: 100%; }
 
 .row-name {
-    padding: 11px 10px 11px 14px;
+    padding: 9px 8px 9px 12px;
     color: #ccc;
     display: flex;
     align-items: center;
     gap: 8px;
-    font-size: 0.9em;
+    font-size: 0.84em;
     font-weight: 500;
     white-space: nowrap;
     overflow: hidden;
@@ -893,16 +914,45 @@ button:disabled { background-color: #555; color: #888; cursor: not-allowed; }
     text-transform: uppercase;
 }
 
-/* ── Dashboard panel ────────────────────────────── */
-.row-dashboard {
+.row-speed {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Courier New', monospace;
+    font-size: 0.88em;
+    font-weight: 800;
+    color: #fff;
+    letter-spacing: 0.2px;
+    border-left: 1px solid #282828;
+    border-right: 1px solid #282828;
+    padding: 0 6px;
+}
+.row-speed span { margin-left: 3px; font-size: 0.7em; color: #8c8c8c; font-weight: 600; }
+
+.player-rpm-card {
+    margin-top: 12px;
+    background: #101010;
+    border: 1px solid #2e2e2e;
+    border-radius: 6px;
+    padding: 10px;
+}
+
+.player-rpm-title {
+    color: #bdbdbd;
+    font-size: 0.72em;
+    text-transform: uppercase;
+    letter-spacing: 1.1px;
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+
+.player-rpm-layout {
     display: grid;
-    grid-template-columns: 62px 1fr;
-    background-color: #111;
-    border-left: 1px solid #2e2e2e;
-    border-right: 1px solid #2e2e2e;
+    grid-template-columns: 58px 1fr;
     min-width: 0;
 }
-.dashboard-gear-panel {
+
+.player-gear-panel {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -910,17 +960,17 @@ button:disabled { background-color: #555; color: #888; cursor: not-allowed; }
     background-color: #0b0b0b;
     border-right: 1px solid #2a2a2a;
     padding: 6px 2px;
-    gap: 0px;
-    cursor: default;
 }
-.dashboard-main-panel {
+
+.player-rpm-main {
     display: flex;
     flex-direction: column;
     justify-content: center;
     gap: 4px;
-    padding: 7px 10px 7px 10px;
+    padding: 7px 10px;
     min-width: 0;
 }
+
 .gear-label {
     font-size: 0.52em;
     color: #555;
@@ -1078,30 +1128,28 @@ button:disabled { background-color: #555; color: #888; cursor: not-allowed; }
 
 /* ── Timer & position ───────────────────────────── */
 .row-timer {
-    padding: 11px 10px;
+    padding: 9px 8px;
     text-align: right;
     color: #e0c040;
     font-family: 'Courier New', monospace;
-    font-size: 0.98em;
+    font-size: 0.86em;
     display: flex;
     align-items: center;
     justify-content: flex-end;
-    border-left: 1px solid #282828;
 }
 .row-pct {
-    padding: 11px 12px 11px 6px;
+    padding: 9px 10px 9px 4px;
     text-align: right;
     color: #bbb;
     font-family: 'Courier New', monospace;
-    font-size: 0.9em;
+    font-size: 0.8em;
     display: flex;
     align-items: center;
     justify-content: flex-end;
 }
 .is-player { background-color: #1b2b1b; }
 .is-player .row-name { color: #fff; font-weight: 700; }
-.is-player .row-dashboard { background-color: #0f1a0f; }
-.is-player .dashboard-gear-panel { background-color: #0b150b; }
+.is-player .row-speed { background-color: #0f1a0f; }
 
 .earnings-box { margin-top: 20px; padding: 15px; background-color: #111; border-radius: 4px; text-align: center; border: 1px solid #333; }
 

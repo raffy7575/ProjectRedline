@@ -65,17 +65,21 @@
             </div>
         </div>
 
-        <div id="race-layout" style="display: none;">
-            <div class="sidebar">
+        <div id="race-layout" class="dashboard-grid" style="display: none;">
+            <div class="dash-column left-col">
                 <div class="sidebar-header">Current car</div>
                 <div id="sidebar-car-name" style="font-size: 1.2em; font-weight: bold; margin-bottom: 20px; color: #fff;">-</div>
                 <div id="sidebar-stats"></div>
+                <div id="player-rpm-dashboard"></div>
+                <div style="margin-top: auto;">
+                    <button onclick="skipSimulation()" class="action-btn" style="width: 100%;">⏭️ Skip Simulation</button>
+                </div>
             </div>
 
-            <div class="main-race-area">
+            <div class="dash-column middle-col" style="flex: 2; display: flex; flex-direction: column;">
                 <div class="race-header" id="race-header-text">Race started</div>
-                <div class="map-container">
-                    <canvas id="race-track" width="600" height="300"></canvas>
+                <div class="map-container" style="flex: 1; min-height: 0; position: relative; display: flex; justify-content: center; align-items: center; background: #111; border-radius: 6px; overflow: hidden;">
+                    <canvas id="race-track" width="600" height="300" style="max-width: 100%; max-height: 100%; object-fit: contain;"></canvas>
                     <div class="race-start-overlay hidden" id="race-start-overlay">
                         <div class="start-light-board" id="start-light-board">
                             <div class="start-light red" id="start-light-red"></div>
@@ -92,11 +96,11 @@
                         <span>Completion: <strong style="color:white;" id="live-completion">0.00%</strong></span>
                     </div>
                 </div>
-                
-                <div class="live-leaderboard" id="live-leaderboard"></div>
-                <div style="margin-top: 15px; display: flex; gap: 10px;">
-                    <button onclick="skipSimulation()" class="action-btn" style="flex: 1;">⏭️ Skip Simulation</button>
-                </div>
+            </div>
+
+            <div class="dash-column right-col">
+                <div class="race-header">Live Standings</div>
+                <div class="live-leaderboard scrollable-area" id="live-leaderboard" style="display: flex; flex-direction: column; gap: 5px;"></div>
             </div>
         </div>
 
