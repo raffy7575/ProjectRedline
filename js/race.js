@@ -111,6 +111,15 @@ function setCustomTrackPath() {
         });
     }
 
+    // Calibrate simulation distance scale against desired real lap distance.
+    // lapMeters = (trackPath.length / PROGRESS_SCALE) * METERS_PER_PROGRESS_STEP
+    let targetLapDistanceKm = Number.isFinite(currentTrack?.realLapDistanceKm) ? currentTrack.realLapDistanceKm : 1.8;
+    let targetLapDistanceMeters = Math.max(0.3, targetLapDistanceKm) * 1000;
+    let calibratedMetersPerStep = (targetLapDistanceMeters * PROGRESS_SCALE) / Math.max(1, trackPath.length);
+    if (typeof setMetersPerProgressStep === 'function') {
+        setMetersPerProgressStep(calibratedMetersPerStep);
+    }
+
     // Keep per-point curvature for physics systems that depend on corner severity.
     const curvatureLook = Math.max(2, Math.floor(trackPath.length / 220));
     for (let i = 0; i < trackPath.length; i++) {
