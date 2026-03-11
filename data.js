@@ -95,8 +95,8 @@ const shopItems = {
         { id: 'exh2', name: 'Titanium Exhaust', cost: 1800, boosts: { topSpeed: 8, acceleration: 4, handling: 2 } }
     ],
     weight: [
-        { id: 'wgt1', name: 'Stripped Interior', cost: 800, boosts: { acceleration: 5, handling: 5, braking: 5 } },
-        { id: 'wgt2', name: 'Carbon Fiber Panels', cost: 4000, boosts: { acceleration: 12, handling: 10, braking: 10 } }
+        { id: 'wgt1', name: 'Stripped Interior', cost: 800, boosts: { acceleration: 5, handling: 5, braking: 5 }, weightReduction: -40 },
+        { id: 'wgt2', name: 'Carbon Fiber Panels', cost: 4000, boosts: { acceleration: 12, handling: 10, braking: 10 }, weightReduction: -80 }
     ],
     suspension: [
         { id: 'sus1', name: 'Lowering Springs', cost: 400, boosts: { handling: 6, tarmac: 5 } },

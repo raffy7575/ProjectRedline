@@ -431,11 +431,31 @@ function normalizeCarForInspection(car) {
     if (!car) return null;
 
     let activeStats = getCarStats(car);
+    
+    // Calculate effective weight including weight reduction upgrades
+    let baseWeight = Number(car.weight) || 0;
+    let totalWeightReduction = 0;
+    if (car.upgrades && Array.isArray(car.upgrades)) {
+        car.upgrades.forEach(upgradeId => {
+            // Find upgrade in shopItems
+            for (let category in gameShop) {
+                if (Array.isArray(gameShop[category])) {
+                    let upgrade = gameShop[category].find(u => u.id === upgradeId);
+                    if (upgrade && upgrade.weightReduction) {
+                        totalWeightReduction += upgrade.weightReduction;
+                    }
+                }
+            }
+        });
+    }
+    
+    let effectiveWeight = baseWeight + totalWeightReduction;
+    
     return {
         id: car.id,
         name: car.name,
         hp: Number(car.hp) || 0,
-        weight: Number(car.weight) || 0,
+        weight: effectiveWeight,
         dirt: Number(activeStats.dirt) || 0,
         tarmac: Number(activeStats.tarmac) || 0
     };

@@ -286,6 +286,12 @@ function buildStandingsTableHTML(activeLeague) {
     `;
 }
 
+function toggleLeagueCollapse(leagueId) {
+    let isCollapsed = localStorage.getItem(`league-collapsed-${leagueId}`) === 'true';
+    localStorage.setItem(`league-collapsed-${leagueId}`, !isCollapsed);
+    renderCareerMode();
+}
+
 function buildRivalIntelHTML(activeLeague) {
     if (!activeLeague || typeof getAiUpgradeFeedForLeague !== 'function') return '';
 
@@ -417,15 +423,21 @@ function renderCareerMode() {
             `;
         }).join('');
 
+        let isCollapsed = localStorage.getItem(`league-collapsed-${league.id}`) === 'true';
         return `
-            <div class="league-block ${leagueUnlocked ? '' : 'league-locked'}" data-league-index="${leagueIndex}">
-                <div class="league-header">
-                    <div class="league-class">${league.class}</div>
-                    <h2>${league.name}</h2>
-                    <p>${league.description}</p>
+            <div class="league-block ${leagueUnlocked ? '' : 'league-locked'} ${isCollapsed ? 'collapsed' : ''}" data-league-id="${league.id}" data-league-index="${leagueIndex}">
+                <div class="league-header" onclick="toggleLeagueCollapse('${league.id}')" style="cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 12px;">
+                    <div style="display: flex; align-items: center; gap: 12px; flex: 1;">
+                        <span class="league-collapse-icon" style="font-size: 0.9em; font-weight: bold; width: 20px; text-align: center;">${isCollapsed ? '▶' : '▼'}</span>
+                        <div>
+                            <div class="league-class">${league.class}</div>
+                            <h2>${league.name}</h2>
+                            <p>${league.description}</p>
+                        </div>
+                    </div>
                     <div class="league-state-badge ${headerState.toLowerCase()}">${headerState}</div>
                 </div>
-                <div class="event-card-list">${cardsHTML}</div>
+                <div class="event-card-list" style="display: ${isCollapsed ? 'none' : 'grid'};">${cardsHTML}</div>
             </div>
         `;
     }).join('');
