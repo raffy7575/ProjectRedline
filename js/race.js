@@ -45,11 +45,34 @@ function setCustomTrackPath() {
         { x: 664, y: 569 }, { x: 700, y: 462 }
     ];
 
-    trackPath = sourceTrackPath.map(point => ({
+    const controlPoints = sourceTrackPath.map(point => ({
         x: point.x * scaleX,
         y: point.y * scaleY,
         curvature: 0
     }));
+
+    // Densify waypoints so progress-index movement maps to realistic on-screen distance.
+    const segmentsPerControlPoint = 28;
+    const numPts = controlPoints.length;
+    trackPath = [];
+
+    for (let i = 0; i < numPts; i++) {
+        let p0 = controlPoints[(i - 1 + numPts) % numPts];
+        let p1 = controlPoints[i];
+        let p2 = controlPoints[(i + 1) % numPts];
+        let p3 = controlPoints[(i + 2) % numPts];
+
+        for (let s = 0; s < segmentsPerControlPoint; s++) {
+            let t = s / segmentsPerControlPoint;
+            let t2 = t * t;
+            let t3 = t2 * t;
+
+            let x = 0.5 * ((2 * p1.x) + (-p0.x + p2.x) * t + (2 * p0.x - 5 * p1.x + 4 * p2.x - p3.x) * t2 + (-p0.x + 3 * p1.x - 3 * p2.x + p3.x) * t3);
+            let y = 0.5 * ((2 * p1.y) + (-p0.y + p2.y) * t + (2 * p0.y - 5 * p1.y + 4 * p2.y - p3.y) * t2 + (-p0.y + 3 * p1.y - 3 * p2.y + p3.y) * t3);
+
+            trackPath.push({ x, y, curvature: 0 });
+        }
+    }
 
     // Keep per-point curvature for physics systems that depend on corner severity.
     for (let i = 0; i < trackPath.length; i++) {
