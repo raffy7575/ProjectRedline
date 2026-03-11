@@ -51,10 +51,10 @@ function setCustomTrackPath() {
         curvature: 0
     }));
 
-    // Densify waypoints so progress-index movement maps to realistic on-screen distance.
+    // First pass: smooth Catmull-Rom spline through control points.
     const segmentsPerControlPoint = 28;
     const numPts = controlPoints.length;
-    trackPath = [];
+    const densePath = [];
 
     for (let i = 0; i < numPts; i++) {
         let p0 = controlPoints[(i - 1 + numPts) % numPts];
@@ -70,15 +70,53 @@ function setCustomTrackPath() {
             let x = 0.5 * ((2 * p1.x) + (-p0.x + p2.x) * t + (2 * p0.x - 5 * p1.x + 4 * p2.x - p3.x) * t2 + (-p0.x + 3 * p1.x - 3 * p2.x + p3.x) * t3);
             let y = 0.5 * ((2 * p1.y) + (-p0.y + p2.y) * t + (2 * p0.y - 5 * p1.y + 4 * p2.y - p3.y) * t2 + (-p0.y + 3 * p1.y - 3 * p2.y + p3.y) * t3);
 
-            trackPath.push({ x, y, curvature: 0 });
+            densePath.push({ x, y, curvature: 0 });
         }
     }
 
+    // Second pass: arc-length reparameterization so each index step represents
+    // near-constant physical distance regardless of local curve shape.
+    const targetStepPx = 4.5;
+    const cumulative = [0];
+    let totalLength = 0;
+
+    for (let i = 0; i < densePath.length; i++) {
+        let a = densePath[i];
+        let b = densePath[(i + 1) % densePath.length];
+        totalLength += Math.hypot(b.x - a.x, b.y - a.y);
+        cumulative.push(totalLength);
+    }
+
+    let sampleCount = Math.max(densePath.length, Math.floor(totalLength / targetStepPx));
+    trackPath = [];
+
+    let segIdx = 0;
+    for (let s = 0; s < sampleCount; s++) {
+        let targetDist = (s / sampleCount) * totalLength;
+        while (segIdx < densePath.length - 1 && cumulative[segIdx + 1] < targetDist) {
+            segIdx++;
+        }
+
+        let a = densePath[segIdx % densePath.length];
+        let b = densePath[(segIdx + 1) % densePath.length];
+        let segStart = cumulative[segIdx];
+        let segEnd = cumulative[segIdx + 1];
+        let segLen = Math.max(0.0001, segEnd - segStart);
+        let t = Math.max(0, Math.min(1, (targetDist - segStart) / segLen));
+
+        trackPath.push({
+            x: a.x + (b.x - a.x) * t,
+            y: a.y + (b.y - a.y) * t,
+            curvature: 0
+        });
+    }
+
     // Keep per-point curvature for physics systems that depend on corner severity.
+    const curvatureLook = Math.max(2, Math.floor(trackPath.length / 220));
     for (let i = 0; i < trackPath.length; i++) {
-        let prev = trackPath[(i - 1 + trackPath.length) % trackPath.length];
+        let prev = trackPath[(i - curvatureLook + trackPath.length) % trackPath.length];
         let curr = trackPath[i];
-        let next = trackPath[(i + 1) % trackPath.length];
+        let next = trackPath[(i + curvatureLook) % trackPath.length];
 
         let dx1 = curr.x - prev.x;
         let dy1 = curr.y - prev.y;
