@@ -27,7 +27,12 @@ let raceGreenHoldMs = 700;
 let raceHiddenAtMs = null;
 
 function setCustomTrackPath() {
-    trackPath = [
+    const sourceW = 2752;
+    const sourceH = 1536;
+    const scaleX = CANVAS_W / sourceW;
+    const scaleY = CANVAS_H / sourceH;
+
+    const sourceTrackPath = [
         { x: 712, y: 428 }, { x: 793, y: 224 }, { x: 987, y: 350 }, { x: 1130, y: 352 },
         { x: 1126, y: 491 }, { x: 1150, y: 588 }, { x: 1174, y: 751 }, { x: 1194, y: 787 },
         { x: 1233, y: 807 }, { x: 1485, y: 885 }, { x: 1653, y: 989 }, { x: 1673, y: 1018 },
@@ -39,6 +44,12 @@ function setCustomTrackPath() {
         { x: 554, y: 928 }, { x: 532, y: 882 }, { x: 525, y: 834 }, { x: 571, y: 736 },
         { x: 664, y: 569 }, { x: 700, y: 462 }
     ];
+
+    trackPath = sourceTrackPath.map(point => ({
+        x: point.x * scaleX,
+        y: point.y * scaleY,
+        curvature: 0
+    }));
 
     // Keep per-point curvature for physics systems that depend on corner severity.
     for (let i = 0; i < trackPath.length; i++) {
