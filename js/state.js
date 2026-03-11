@@ -9,8 +9,8 @@ let currentRaceEvent = null;
 let isSkippingSimulation = false;
 let isFastForwardingNow = false;
 
-const CANVAS_W = 600;
-const CANVAS_H = 300;
+const CANVAS_W = 1920;
+const CANVAS_H = 1080;
 const TIME_MULTIPLIER = 1.0;
 const MAX_FRAME_DT = 0.05;
 const PROGRESS_SCALE = 10;

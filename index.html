@@ -8,7 +8,7 @@
 </head>
 <body>
 
-    <div class="modal-overlay" id="name-modal-overlay" style="display: none;">
+    <div class="modal-overlay" id="name-modal-overlay">
         <div class="name-modal">
             <h2>Welcome to Street Racing League</h2>
             <p>Enter your driver name to start your racing career</p>
@@ -17,20 +17,21 @@
         </div>
     </div>
 
-    <div class="modal-overlay" id="reset-modal-overlay" style="display: none;">
+    <div class="modal-overlay" id="reset-modal-overlay">
         <div class="name-modal">
             <h2>Reset Progress?</h2>
             <p>This will delete all your data and start a new career. This cannot be undone.</p>
-            <div style="display: flex; gap: 10px; margin-top: 20px;">
-                <button onclick="confirmReset()" class="action-btn" style="flex: 1; background-color: #f44336;">Reset</button>
-                <button onclick="cancelReset()" style="flex: 1; background-color: #333; color: #fff;">Cancel</button>
+            <div class="modal-action-row">
+                <button onclick="confirmReset()" class="action-btn btn-danger">Reset</button>
+                <button onclick="cancelReset()" class="btn-secondary">Cancel</button>
             </div>
         </div>
     </div>
 
+    <main id="app-main" role="main">
     <h1>Street Racing League</h1>
     
-    <div class="nav-tabs">
+    <div class="nav-tabs" role="tablist" aria-label="Main navigation tabs">
         <button class="tab-btn active" data-tab="tab-garage" onclick="openTab('tab-garage', this)">Garage & Race</button>
         <button class="tab-btn" data-tab="tab-dealership" onclick="openTab('tab-dealership', this)">Dealership</button>
         <button class="tab-btn tab-locked disabled" id="tab-btn-tuning" data-tab="tab-tuning" onclick="openTab('tab-tuning', this)" title="Tuning Shop unlocks at Semi-Pro League (Class C)">🔒 Tuning Shop</button>
@@ -46,7 +47,7 @@
                         <div class="profile-name" id="player-name">Driver</div>
                         <div class="profile-bank">$<span id="player-money">0</span></div>
                     </div>
-                    <button onclick="showResetModal()" class="reset-icon-btn" title="Reset Progress">🔄</button>
+                    <button onclick="showResetModal()" class="reset-icon-btn" title="Reset Progress" aria-label="Reset progress">🔄</button>
                 </div>
 
                 <h2>My Garage</h2>
@@ -65,23 +66,11 @@
             </div>
         </div>
 
-        <div id="race-layout" class="dashboard-grid" style="display: none;">
-            <div class="dash-column left-col">
-                <div class="telemetry-card">
-                    <div class="sidebar-header">COCKPIT TELEMETRY</div>
-                    <div id="sidebar-car-name" style="font-size: 1.2em; font-weight: bold; margin-bottom: 20px; color: #fff;">-</div>
-                    <div id="sidebar-stats"></div>
-                    <div id="player-rpm-dashboard"></div>
-                </div>
-                <div style="margin-top: auto;">
-                    <button onclick="skipSimulation()" class="action-btn" style="width: 100%;">⏭️ Skip Simulation</button>
-                </div>
-            </div>
-
-            <div class="dash-column middle-col" style="flex: 2; display: flex; flex-direction: column;">
+        <div id="race-layout" class="dashboard-grid" aria-live="polite">
+            <div class="dash-column main-race-col">
                 <div class="race-header" id="race-header-text">Race started</div>
-                <div class="map-container" style="flex: 1; min-height: 0; position: relative; display: flex; justify-content: center; align-items: center; background: #111; border-radius: 6px; overflow: hidden;">
-                    <canvas id="race-track" width="1600" height="1200" style="max-width: 100%; max-height: 100%; object-fit: contain;"></canvas>
+                <div class="map-container race-map-container">
+                    <canvas id="race-track" width="1920" height="1080" class="race-track-canvas"></canvas>
                     <div class="race-start-overlay hidden" id="race-start-overlay">
                         <div class="start-light-board" id="start-light-board">
                             <div class="start-light red" id="start-light-red"></div>
@@ -91,35 +80,44 @@
                         <div class="start-light-text" id="race-start-text">GET READY</div>
                     </div>
                     <div class="map-overlay">
-                        <span>Name: <strong style="color:white;" id="overlay-player-name">Driver</strong></span>
-                        <span>Position: <strong style="color:white;" id="live-pos">-</strong></span>
-                        <span>Lap: <strong style="color:white;" id="live-lap">-</strong></span>
-                        <span>Last Lap: <strong style="color:white;" id="live-last-lap">-</strong></span>
-                        <span>Completion: <strong style="color:white;" id="live-completion">0.00%</strong></span>
+                        <span>Name: <strong class="text-strong-white" id="overlay-player-name">Driver</strong></span>
+                        <span>Position: <strong class="text-strong-white" id="live-pos" aria-live="polite" aria-label="Race position">-</strong></span>
+                        <span>Lap: <strong class="text-strong-white" id="live-lap" aria-live="polite" aria-label="Current lap">-</strong></span>
+                        <span>Last Lap: <strong class="text-strong-white" id="live-last-lap">-</strong></span>
+                        <span>Completion: <strong class="text-strong-white" id="live-completion">0.00%</strong></span>
                     </div>
                 </div>
+                <div class="telemetry-horizontal-bar">
+                    <div id="sidebar-car-name" class="race-car-name">-</div>
+                    <div id="player-telemetry-panel" class="telemetry-rpm-zone"></div>
+                    <div class="telemetry-actions">
+                        <button onclick="skipSimulation()" class="action-btn telemetry-skip-btn">⏭️ Skip Simulation</button>
+                    </div>
+                </div>
+                <div id="sidebar-stats"></div>
             </div>
 
             <div class="dash-column right-col">
                 <div class="race-header">Live Standings</div>
-                <div class="live-leaderboard scrollable-area" id="live-leaderboard" style="display: flex; flex-direction: column; gap: 5px;"></div>
+                <div class="live-leaderboard scrollable-area" id="live-leaderboard"></div>
             </div>
         </div>
 
-        <div class="panel" id="results-panel" style="display: none; margin-top: 20px;">
+        <div class="panel" id="results-panel">
             <h2>Race Finished</h2>
             <div class="earnings-box">
                 <h3>Race Earnings</h3>
-                <p id="earnings-text" style="color: #4CAF50; font-size: 1.2em; font-weight: bold;">$0</p>
+                <p id="earnings-text" class="earnings-text">$0</p>
             </div>
-            <button onclick="resetGame()" style="margin-top: 20px;">Accept & Prepare Next Race</button>
+            <button onclick="resetGame()" class="results-accept-btn">Accept &amp; Prepare Next Race</button>
         </div>
     </div>
+    </main>
 
     <div id="tab-dealership" class="tab-content">
         <div class="panel">
             <h2>Dealership</h2>
-            <p style="color: #888; font-size: 0.9em; margin-bottom: 18px;">Browse available cars. Special Offers rotate automatically every 15 minutes.</p>
+            <p class="panel-description">Browse available cars. Special Offers rotate automatically every 15 minutes.</p>
 
             <div class="dealer-section-title">Stock Cars</div>
             <div id="stock-car-grid" class="car-grid"></div>
@@ -134,8 +132,8 @@
 
     <div id="tab-tuning" class="tab-content">
         <div class="panel">
-            <h2>Tuning Shop - <span id="shop-car-name" style="color: #8BC34A;">Select an owned car first</span></h2>
-            <p style="color: #888; font-size: 0.9em; margin-bottom: 20px;">Upgrades apply ONLY to the currently selected car.</p>
+            <h2>Tuning Shop - <span id="shop-car-name">Select an owned car first</span></h2>
+            <p class="panel-description">Upgrades apply ONLY to the currently selected car.</p>
             <div id="tuning-categories"></div>
         </div>
     </div>
@@ -143,7 +141,7 @@
     <div id="tab-skills" class="tab-content">
         <div class="panel">
             <h2>Driver Skill Tree</h2>
-            <p style="color: #888; font-size: 0.9em; margin-bottom: 20px;">These skills give a percentage boost to any car you drive.</p>
+            <p class="panel-description">These skills give a percentage boost to any car you drive.</p>
             <div class="skill-grid" id="skill-grid"></div>
         </div>
     </div>
@@ -154,6 +152,7 @@
     <script src="js/utils.js"></script>
     <script src="js/career.js"></script>
     <script src="js/ai-career.js"></script>
+    <script src="js/ui-accessibility.js"></script>
     <script src="js/garage.js"></script>
     <script src="js/dealership.js"></script>
     

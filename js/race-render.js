@@ -370,10 +370,10 @@ function drawTrackStartLine(ctx) {
     ctx.translate(p0.x, p0.y);
     ctx.rotate(angle);
     ctx.fillStyle = '#ffffff';
-    ctx.fillRect(-2, -12, 4, 24);
+    ctx.fillRect(-6, -36, 12, 72);
     for (let i = 0; i < 4; i++) {
         ctx.fillStyle = i % 2 === 0 ? '#ffffff' : '#111111';
-        ctx.fillRect(-8 + i * 4, -12, 4, 24);
+        ctx.fillRect(-24 + i * 12, -36, 12, 72);
     }
     ctx.restore();
 }
@@ -386,12 +386,17 @@ function renderTrack(ctx) {
     ctx.fillRect(0, 0, CANVAS_W, CANVAS_H);
 
     traceTrackPath(ctx);
-    ctx.lineWidth = 14;
+    ctx.lineWidth = 72;
+    ctx.strokeStyle = '#0f2a18';
+    ctx.stroke();
+
+    traceTrackPath(ctx);
+    ctx.lineWidth = 54;
     ctx.strokeStyle = '#163821';
     ctx.stroke();
 
     traceTrackPath(ctx);
-    ctx.lineWidth = 4;
+    ctx.lineWidth = 42;
     ctx.strokeStyle = '#41d66b';
     ctx.stroke();
 
@@ -416,34 +421,19 @@ function renderCars(ctx) {
         };
 
         ctx.beginPath();
-        ctx.arc(pos.x, pos.y, 5, 0, 2 * Math.PI);
+        ctx.arc(pos.x, pos.y, 15, 0, 2 * Math.PI);
         ctx.fillStyle = state.car.color || '#ffffff';
         ctx.fill();
         if (state.isPlayer) {
-            ctx.lineWidth = 1;
+            ctx.lineWidth = 3;
             ctx.strokeStyle = 'white';
             ctx.stroke();
         }
     });
 }
 
-function buildRpmScaleLabelMarkup(labelText, rpmValue, redline, toneClass) {
-    let clampedRpmValue = Math.max(0, Math.min(redline, rpmValue));
-    let leftPct = redline > 0 ? (clampedRpmValue / redline) * 100 : 0;
-    return `<span class="${toneClass}" style="left:${leftPct.toFixed(2)}%">${labelText}</span>`;
-}
-
 function buildRpmGuideLinesMarkup(redline) {
-    let guides = [];
-    let wholeSteps = Math.floor(redline / 1000);
-
-    for (let i = 1; i <= wholeSteps; i++) {
-        let rpmValue = i * 1000;
-        let leftPct = redline > 0 ? (rpmValue / redline) * 100 : 0;
-        guides.push(`<span class="rpm-guide-line" style="left:${leftPct.toFixed(2)}%"></span>`);
-    }
-
-    return guides.join('');
+    return '';
 }
 
 function buildRpmScaleMarkup(redline) {
@@ -452,34 +442,21 @@ function buildRpmScaleMarkup(redline) {
 
     for (let i = 1; i <= wholeSteps; i++) {
         let rpmValue = i * 1000;
-        labels.push(buildRpmScaleLabelMarkup(String(i), rpmValue, redline, i % 2 === 0 ? 'major' : 'minor'));
+        let leftPct = redline > 0 ? (Math.max(0, Math.min(redline, rpmValue)) / redline) * 100 : 0;
+        let toneClass = i % 2 === 0 ? 'major' : 'minor';
+        labels.push(`<span class="${toneClass}" style="position: absolute; left: ${leftPct.toFixed(2)}%; transform: translateX(-50%); padding: 0; margin: 0;">${i}</span>`);
     }
 
     return labels.join('');
 }
 
-function buildRpmSegmentsMarkup(redline, rpm) {
-    let maxStep = Math.max(1, Math.ceil(redline / 1000));
-    let segments = [];
-    let redlineStartRpm = Math.max(1000, redline - 1000);
+function buildRpmFillMarkup(redline, rpm) {
     let clampedRpm = Math.max(0, Math.min(redline, rpm));
+    let fillPercent = redline > 0 ? (clampedRpm / redline) * 100 : 0;
+    let isNearRedline = redline > 0 ? clampedRpm >= (redline * 0.88) : false;
+    let dynamicColor = isNearRedline ? '#F44336' : '#f5f5f5';
 
-    for (let i = 0; i < maxStep; i++) {
-        let segStart = i * 1000;
-        let segEnd = Math.min(redline, (i + 1) * 1000);
-        let segRange = Math.max(1, segEnd - segStart);
-        let fillRatio = Math.max(0, Math.min(1, (clampedRpm - segStart) / segRange));
-        let isRedlineSegment = segEnd > redlineStartRpm;
-        let fillClass = isRedlineSegment ? ' redline' : '';
-
-        segments.push(`
-            <span class="rpm-segment${isRedlineSegment ? ' is-redline' : ''}" style="flex:${segRange} 0 0;">
-                <span class="rpm-segment-fill${fillClass}" style="width:${(fillRatio * 100).toFixed(1)}%"></span>
-            </span>
-        `);
-    }
-
-    return segments.join('');
+    return `<div class="rpm-fill-bar" style="width:${fillPercent}%; position: absolute; left: 0; top: 0; height: 100%; background-color:${dynamicColor};"></div>`;
 }
 
 function createLeaderboardRow(state, statusDisplay) {
@@ -513,7 +490,6 @@ function createPlayerRpmDashboardMarkup(state) {
 
     return `
         <div class="player-rpm-card">
-            <div class="player-rpm-title">Player RPM Dashboard</div>
             <div class="player-rpm-layout">
                 <div class="player-gear-panel">
                     <span class="gear-label">gear</span>
@@ -525,8 +501,7 @@ function createPlayerRpmDashboardMarkup(state) {
                         <div class="dashboard-speed-badge">${speedKmh}<span>km/h</span></div>
                     </div>
                     <div class="rpm-bar-bg ${shiftLightActive ? 'is-blinking' : ''}" style="${redlineGlow}">
-                        <div class="rpm-segments">${buildRpmSegmentsMarkup(redline, uiRpm)}</div>
-                        <div class="rpm-guide-lines">${buildRpmGuideLinesMarkup(redline)}</div>
+                        <div class="rpm-segments">${buildRpmFillMarkup(redline, uiRpm)}</div>
                     </div>
                     <div class="rpm-meta-row">
                         <div class="rpm-scale">${buildRpmScaleMarkup(redline)}</div>
@@ -542,7 +517,7 @@ function createPlayerRpmDashboardMarkup(state) {
 
 function updateLiveUI(sortedRacers) {
     const list = document.getElementById('live-leaderboard');
-    const playerRpmDashboard = document.getElementById('player-rpm-dashboard');
+    const playerRpmDashboard = document.getElementById('player-telemetry-panel');
     if (!list) return;
     list.innerHTML = '';
     if (playerRpmDashboard) playerRpmDashboard.innerHTML = '';

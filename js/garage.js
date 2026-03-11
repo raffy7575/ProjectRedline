@@ -5,6 +5,9 @@ function completeInitialization() {
     buildSkillTree();
     buildMaintenancePanel();
     updateTabGates();
+    if (typeof initTabAccessibility === 'function') {
+        initTabAccessibility();
+    }
     if (selectedPlayerCar) {
         selectCar(selectedPlayerCar);
     }
@@ -20,8 +23,17 @@ function openTab(tabId, btn) {
 
     document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-    document.getElementById(tabId).classList.add('active');
-    btn.classList.add('active');
+
+    const tabPanel = document.getElementById(tabId);
+    if (!tabPanel) return;
+
+    tabPanel.classList.add('active');
+    if (btn) btn.classList.add('active');
+
+    if (typeof syncTabAccessibility === 'function') {
+        syncTabAccessibility(tabId);
+    }
+
     if (tabId === 'tab-tuning') buildTuningShop();
     if (tabId === 'tab-dealership') { buildDealership(); startDealerCountdownTimer(); }
 }
