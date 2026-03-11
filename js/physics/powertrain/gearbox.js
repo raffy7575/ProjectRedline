@@ -23,10 +23,13 @@ function shouldDownshiftAccel(state, physics, wheelRpmReal, currentGearRatio) {
     
     let lowerGearRatio = getEffectiveGearRatio(physics, state.currentGear - 1);
     let predictedRpmLowerGear = calculateRpmFromWheelSpeed(wheelRpmReal, lowerGearRatio);
+    let currentUpshiftThreshold = getUpshiftThreshold(physics, 0);
 
-    return state.rpm < physics.REDLINE * 0.65 
-        && state.throttle > 0.92 
-        && predictedRpmLowerGear < physics.REDLINE * 0.90;
+    // Hysteresis: Only downshift if RPM really drops (< 55%) 
+    // AND the lower gear won't immediately trigger another upshift (< 92% of the upshift threshold)
+    return state.rpm < physics.REDLINE * 0.55 
+        && state.throttle > 0.85 
+        && predictedRpmLowerGear < (currentUpshiftThreshold * 0.92);
 }
 
 function updateRpmDuringShift(state, dt, targetRevMatch, isDownshift) {

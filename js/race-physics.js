@@ -231,7 +231,8 @@ function computeTargetSpeedData(state, physics, draftWindow) {
             nearestCurveDistance = Math.min(nearestCurveDistance, i);
             let curveRadius = 24 / c;
             trailBrakeGripBoost = 1 + Math.max(0, physics.frontLoadBias - 0.5) * Math.min(1, state.brake) * 0.22;
-            let curveMaxSpeedMs = Math.sqrt(Math.max(0.01, (physics.actualGrip * trailBrakeGripBoost) * 9.81 * curveRadius));
+            // Remove trailBrakeGripBoost from planning
+            let curveMaxSpeedMs = Math.sqrt(Math.max(0.01, physics.actualGrip * 9.81 * curveRadius));
             let curveMaxSpeedInternal = (curveMaxSpeedMs / physics.INTERNAL_TO_MS) * CURVE_SPEED_SAFETY_MARGIN;
             let distInternal = Math.max(0, i / PROGRESS_SCALE);
             let safeSpeedSq = (curveMaxSpeedInternal * curveMaxSpeedInternal) + (2 * physics.brakeDecelInternal * distInternal * BRAKE_DISTANCE_SAFETY_MARGIN);
@@ -250,7 +251,8 @@ function computeTargetSpeedData(state, physics, draftWindow) {
     
     if (currCurvature > 0.03) {
         let currentCurveRadius = 24 / currCurvature;
-        let immediateCurveSpeedMs = Math.sqrt(Math.max(0.01, physics.actualGrip * currTrailBrakeGripBoost * 9.81 * currentCurveRadius));
+        // Remove currTrailBrakeGripBoost from planning
+        let immediateCurveSpeedMs = Math.sqrt(Math.max(0.01, physics.actualGrip * 9.81 * currentCurveRadius));
         let immediateCurveSpeedInternal = (immediateCurveSpeedMs / physics.INTERNAL_TO_MS) * CURRENT_CURVE_SPEED_MARGIN;
         targetSpeed = Math.min(targetSpeed, immediateCurveSpeedInternal);
     }
