@@ -24,6 +24,75 @@ let isRaceCountdownActive = false;
 let raceCountdownStartTime = 0;
 let raceCountdownDurationMs = 3200;
 let raceGreenHoldMs = 700;
+let raceHiddenAtMs = null;
+
+function simulateHiddenRaceTime(hiddenElapsedMs) {
+    if (!isRaceActive || isRaceCountdownActive || isSkippingSimulation || hiddenElapsedMs <= 0) return;
+    if (!Array.isArray(raceState) || raceState.length === 0) return;
+
+    const draftWindow = 40;
+    const fixedStepSeconds = 1 / 30;
+    const maxCatchupSteps = 12000;
+    let remainingSeconds = hiddenElapsedMs / 1000;
+
+    for (let step = 0; step < maxCatchupSteps && remainingSeconds > 0; step++) {
+        if (raceState.every(state => !state || state.finished)) break;
+
+        let frameSeconds = Math.min(fixedStepSeconds, remainingSeconds);
+        let dt = frameSeconds * TIME_MULTIPLIER;
+        remainingSeconds -= frameSeconds;
+        globalRaceTime += dt;
+
+        raceState.forEach(state => {
+            if (!state || state.finished) return;
+            try {
+                updateVehicleState(state, dt, draftWindow);
+            } catch (error) {
+                state.finished = true;
+                state.finalTotalTime = Number.MAX_SAFE_INTEGER;
+                console.error('Race simulation error for entry:', state?.car?.id || 'unknown-car', error);
+            }
+        });
+
+        let finishedCount = raceState.filter(s => s.finished).length;
+        let totalCars = raceState.length;
+        if (finishedCount >= totalCars - 1) {
+            raceState.forEach(state => {
+                if (!state.finished) {
+                    state.finished = true;
+                    state.finalTotalTime = globalRaceTime;
+                }
+            });
+            break;
+        }
+    }
+
+    let sortedRacers = [...raceState].sort((a, b) => b.totalProgress - a.totalProgress);
+    updateLiveUI(sortedRacers);
+
+    if (raceState.every(state => state?.finished)) {
+        endRace(sortedRacers);
+    }
+}
+
+function handleRaceVisibilityChange() {
+    if (!isRaceActive || isSkippingSimulation) return;
+
+    if (document.hidden) {
+        raceHiddenAtMs = performance.now();
+        return;
+    }
+
+    if (raceHiddenAtMs) {
+        let hiddenElapsedMs = Math.max(0, performance.now() - raceHiddenAtMs);
+        raceHiddenAtMs = null;
+        simulateHiddenRaceTime(hiddenElapsedMs);
+    }
+
+    lastTime = performance.now();
+}
+
+document.addEventListener('visibilitychange', handleRaceVisibilityChange);
 
 // Controls the red/yellow/green start-light overlay.
 // `phase` should be: 'red' | 'yellow' | 'green'.
@@ -257,6 +326,7 @@ function gameLoop(currentTime) {
 function endRace(sortedRacers) {
     if (!isRaceActive) return;
     isRaceActive = false;
+    raceHiddenAtMs = null;
     isSkippingSimulation = false;
     isFastForwardingNow = false;
     document.getElementById('race-layout').style.display = 'none';
