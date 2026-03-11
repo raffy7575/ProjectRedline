@@ -1,6 +1,6 @@
 // Tire Physics Model - Pacejka Magic Formula and Slip Calculations
 
-function calculateSlipAndGrip(state, physics, currCurvature, trailBrakeGripBoost = 1.0) {
+function calculateSlipAndGrip(state, physics, currCurvature, trailBrakeGripBoost = 1.0, dt = 1 / 60) {
     let localRadiusMeters = 24 / Math.max(0.01, currCurvature);
     let localMaxCornerSpeedMsBase = Math.sqrt(Math.max(0.01, (physics.actualGrip * trailBrakeGripBoost) * 9.81 * localRadiusMeters));
     let lateralAccelDemandMs2 = currCurvature > 0.01 ? ((physics.speedMs * physics.speedMs) / localRadiusMeters) : 0;
@@ -16,7 +16,6 @@ function calculateSlipAndGrip(state, physics, currCurvature, trailBrakeGripBoost
     let gripFromSlip = Math.max(0.55, Math.min(1.02, magicGripCurve));
 
     let slipAngleTarget = Math.max(0, Math.min(16, slipNorm * 12));
-    let dt = 1 / 60;
     state.slipAngleDeg += (slipAngleTarget - state.slipAngleDeg) * Math.min(1, dt * 8);
 
     let localMaxCornerSpeedMs = localMaxCornerSpeedMsBase * gripFromSlip;

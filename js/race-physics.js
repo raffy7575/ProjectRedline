@@ -339,7 +339,7 @@ function applyDriverInputsAndSlip(state, dt, physics, targetData) {
     let currCurvature = trackPath[currIdx]?.curvature || 0;
 
     // Use tire physics module with trail-brake grip boost
-    let slipData = calculateSlipAndGrip(state, physics, currCurvature, targetData.trailBrakeGripBoost);
+    let slipData = calculateSlipAndGrip(state, physics, currCurvature, targetData.trailBrakeGripBoost, dt);
     let tireData = detectSlidingAndLocking(state, physics, slipData, currCurvature);
 
     let isSliding = tireData.isSliding;
@@ -359,6 +359,7 @@ function applyDriverInputsAndSlip(state, dt, physics, targetData) {
         state.brake *= (1 - state.wheelLock * 0.45);
         if (currCurvature > 0.1) {
             desiredThrottle *= (1 - state.wheelLock * 0.35);
+            state.throttle *= (1 - state.wheelLock * 0.35);
             state.speed -= (physics.brakeDecelInternal * 0.10 * state.wheelLock) * dt;
         }
     }

@@ -9,7 +9,11 @@ function applyLongitudinalForces(state, dt, physics, drivetrainData) {
 
     // Drag and engine braking (foot brake and engine brake are independent)
     let dragDecel = calculateDragDeceleration(state, physics);
-    let engineBrakeDecel = applyEngineBrake(state, physics, drivetrainData.currentGearRatio);
+    let engineBrakeDecel = 0;
+    let clutchEngagement = typeof state.clutchEngagement === 'number' ? state.clutchEngagement : 1;
+    if ((state.shiftCooldown || 0) <= 0 && clutchEngagement > 0.96) {
+        engineBrakeDecel = applyEngineBrake(state, physics, drivetrainData.currentGearRatio);
+    }
     let passiveDecel = dragDecel + engineBrakeDecel;
 
     // Apply full braking force with smooth ramping curve
