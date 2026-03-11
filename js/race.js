@@ -1,8 +1,32 @@
+/* =============================================================================
+     js/race.js  —  Race flow controller (start → simulate → finish → rewards)
+
+     WHAT THIS FILE DOES
+     - Starts a race from a selected career event
+     - Runs the frame-by-frame simulation loop
+     - Updates race UI (overlay, header, standings, telemetry)
+     - Ends race, calculates payout/progression/wear
+     - Handles skip simulation and hard reset modal actions
+
+     HOW TO SAFELY EDIT
+     - UI text: edit string literals in `updateRaceStartOverlay()`, `startSimulation()`,
+         and `endRace()`.
+     - Countdown timing: `raceCountdownDurationMs`, `raceGreenHoldMs`, and thresholds
+         inside `gameLoop()`.
+     - Prize distribution: position multipliers inside `endRace()`.
+
+     CAUTION
+     - Load order matters because this file uses globals from other files.
+     - If changing function names, also update any `onclick="..."` usage in HTML.
+     ============================================================================= */
+
 let isRaceCountdownActive = false;
 let raceCountdownStartTime = 0;
 let raceCountdownDurationMs = 3200;
 let raceGreenHoldMs = 700;
 
+// Controls the red/yellow/green start-light overlay.
+// `phase` should be: 'red' | 'yellow' | 'green'.
 function updateRaceStartOverlay(phase, text) {
     let overlay = document.getElementById('race-start-overlay');
     let label = document.getElementById('race-start-text');
@@ -28,6 +52,8 @@ function hideRaceStartOverlay() {
     if (overlay) overlay.classList.add('hidden');
 }
 
+// Applies post-race car wear (engine/tires/suspension) if maintenance is unlocked.
+// Returns wear details + full service cost for result UI.
 function applyWearAndTearFromRace(playerRaceState) {
     // Feature gate: wear is locked until Class B (tier 3)
     if (typeof isFeatureUnlocked === 'function' && !isFeatureUnlocked('maintenance')) return null;
@@ -100,6 +126,7 @@ function startSimulation(eventId) {
     currentRaceEvent = event;
     currentTrack = track;
 
+    // Reset any previous animation frame before starting a new race.
     cancelAnimationFrame(animationId);
     isRaceActive = true;
     generateTrackPath();
@@ -114,9 +141,11 @@ function startSimulation(eventId) {
     document.getElementById('race-header-text').innerText = `${event.name} - ${currentTrack.name} - ${currentTrack.laps} laps - On the grid`;
     updateRaceStartOverlay('red', 'RED LIGHTS');
 
+    // Enter main simulation loop.
     animationId = requestAnimationFrame(gameLoop);
 }
 
+// Main race loop. Runs every frame (or simulated frame during skip mode).
 function gameLoop(currentTime) {
     const canvas = document.getElementById('race-track');
     const ctx = canvas.getContext('2d');
@@ -127,6 +156,7 @@ function gameLoop(currentTime) {
     renderTrack(ctx);
     renderCars(ctx);
 
+    // 3-stage pre-race countdown: red → yellow → green.
     if (isRaceCountdownActive) {
         if (!raceCountdownStartTime) raceCountdownStartTime = currentTime;
 
@@ -161,6 +191,7 @@ function gameLoop(currentTime) {
         return;
     }
 
+    // Delta-time in seconds between frames.
     let rawDt = (currentTime - lastTime) / 1000;
 
     if (!isSkippingSimulation && (rawDt < 0 || rawDt > MAX_FRAME_DT)) {
@@ -173,6 +204,7 @@ function gameLoop(currentTime) {
     lastTime = currentTime;
     globalRaceTime += dt;
 
+    // In skip mode we still simulate physics, but avoid expensive rendering.
     const shouldRender = !isSkippingSimulation;
 
     if (shouldRender) {
@@ -231,6 +263,7 @@ function endRace(sortedRacers) {
 
     sortedRacers.sort((a, b) => a.finalTotalTime - b.finalTotalTime);
 
+    // Prize table by finishing position.
     let playerPos = sortedRacers.findIndex(s => s.isPlayer) + 1;
     let basePrize = currentRaceEvent?.prize || 1000;
     let prize = 0;
@@ -252,6 +285,7 @@ function endRace(sortedRacers) {
         }
     }
 
+    // Apply reward and persist progress.
     playerData.money += prize;
     saveGameState();
 
@@ -289,10 +323,12 @@ function endRace(sortedRacers) {
         let names = aiUpgradeFeed.map(e => (e.rivalName || '').split(' ')[0]).filter(Boolean);
         aiUpgradeLine = `<br><span style="color:#ff9800; font-size:0.78em;">&#128270; Rivals upgraded: ${names.join(', ')} &mdash; check Rival Intel</span>`;
     }
+    // Results block supports rich status lines (career target, wear, AI upgrades).
     document.getElementById('earnings-text').innerHTML = `$${prize} (Finished ${playerPos}º)${eventLine}${pointsLine}${careerLine}${wearLine}${serviceLine}${aiUpgradeLine}`;
     document.getElementById('results-panel').style.display = 'block';
 }
 
+// Fast-forwards simulation to race end (physics kept, drawing minimized).
 function skipSimulation() {
     if (isRaceCountdownActive) return;
     if (!isSkippingSimulation) {
@@ -330,6 +366,7 @@ function confirmReset() {
     isRaceActive = false;
     localStorage.removeItem('projectRedlineSaveV1');
 
+    // Hard reset: rebuild player profile to default starter state.
     playerData = {
         name: 'Driver',
         money: 10000,
@@ -378,6 +415,7 @@ function confirmReset() {
 }
 
 function resetGame() {
+    // Soft reset after a finished race: return to event selection screen.
     document.getElementById('results-panel').style.display = 'none';
     document.getElementById('selection-panel').style.display = 'block';
     currentRaceEvent = null;

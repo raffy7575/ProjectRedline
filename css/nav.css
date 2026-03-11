@@ -1,6 +1,18 @@
-/* ─────────────────────────────────────────────────────────────────────────────
-   Navigation  –  HUD bar, tab strip, tab panels.
-   ─────────────────────────────────────────────────────────────────────────── */
+/* =============================================================================
+    css/nav.css  —  Top HUD and navigation tabs.
+
+    WHAT THIS FILE CONTROLS
+    - The top HUD strip (money/status bar)
+    - Tab button styling (default, hover, active)
+    - Locked-tab behavior and tooltip
+    - Show/hide behavior for tab panels
+
+    SAFE THINGS TO EDIT
+    - `.hud` colors, padding, border accent
+    - `.tab-btn` size/colors for button feel
+    - `.tab-btn.active` to change selected-tab look
+    - Tooltip style in `.tab-btn.tab-locked::after`
+    ============================================================================= */
 .hud {
     display: flex;
     justify-content: space-between;

@@ -1,4 +1,15 @@
-// Tire Physics Model - Pacejka Magic Formula and Slip Calculations
+/* =============================================================================
+    js/physics/tires/model.js  —  Tire grip, slip, and lock-up behavior
+
+    WHAT THIS FILE DOES
+    - Estimates slip ratio and grip response (simplified Pacejka-style curve)
+    - Detects sliding and wheel lock tendency under braking
+    - Provides local corner speed limits based on curvature + grip
+
+    SAFE THINGS TO EDIT
+    - Slip thresholds in `calculateSlipAndGrip()`
+    - Lock-up risk multipliers in `detectSlidingAndLocking()`
+    ============================================================================= */
 
 function calculateSlipAndGrip(state, physics, currCurvature, trailBrakeGripBoost = 1.0, dt = 1 / 60) {
     let localRadiusMeters = 24 / Math.max(0.01, currCurvature);

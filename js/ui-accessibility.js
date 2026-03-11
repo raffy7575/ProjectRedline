@@ -1,3 +1,17 @@
+/* =============================================================================
+    js/ui-accessibility.js  —  Keyboard + screen-reader support layer
+
+    WHAT THIS FILE DOES
+    - Adds ARIA semantics for tabs and tab panels
+    - Implements keyboard navigation (Left/Right/Home/End)
+    - Creates an off-screen polite live region for announcements
+
+    SAFE THINGS TO EDIT
+    - Spoken announcement text in `announce()` calls
+    - Key bindings in `initTabAccessibility()`
+    - ARIA labels for tab list and panels
+    ============================================================================= */
+
 function getTabButtonForPanel(panelId) {
     return document.querySelector(`.tab-btn[data-tab="${panelId}"]`);
 }
@@ -31,6 +45,7 @@ function getLiveRegion() {
 }
 
 function announce(message) {
+    // Clears then re-sets text so repeated identical announcements still fire.
     const region = getLiveRegion();
     // Clear, then set on next tick so repeated identical strings still trigger
     region.textContent = '';
@@ -38,6 +53,7 @@ function announce(message) {
 }
 
 function syncTabAccessibility(activePanelId) {
+    // Keeps ARIA-selected, tabindex, and hidden state synchronized with active tab.
     const tabButtons = Array.from(document.querySelectorAll('.tab-btn[data-tab]'));
     const panels = Array.from(document.querySelectorAll('.tab-content[id]'));
 

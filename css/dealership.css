@@ -1,6 +1,19 @@
-/* ─────────────────────────────────────────────────────────────────────────────
-   Dealership  –  car grid, badges, special-offer cards, animations.
-   ─────────────────────────────────────────────────────────────────────────── */
+/* =============================================================================
+    css/dealership.css  —  Dealership tab visuals.
+
+    WHAT THIS FILE CONTROLS
+    - Dealer section headers/titles
+    - Car availability badges
+    - Special-offer card appearance
+    - Shimmer + pulse animations for promo cars
+    - Archetype-specific background gradients
+
+    SAFE THINGS TO EDIT
+    - Badge colors/fonts (`.dealer-badge`)
+    - Countdown text style (`.dealer-countdown`)
+    - Special-offer glow intensity (`box-shadow`)
+    - Animation speed in `@keyframes` usage
+    ============================================================================= */
 .dealer-section-title {
     font-size: 0.88em;
     font-weight: 800;

@@ -1,6 +1,20 @@
-/* ─────────────────────────────────────────────────────────────────────────────
-   Race  –  race layout, canvas, telemetry bar, start lights, leaderboard.
-   ─────────────────────────────────────────────────────────────────────────── */
+/* =============================================================================
+    css/race.css  —  Live race screen layout + UI.
+
+    WHAT THIS FILE CONTROLS
+    - Race screen two-column layout
+    - Track/canvas container visuals
+    - Telemetry bar positioning
+    - Start-light countdown overlay
+    - Live leaderboard table
+
+    SAFE THINGS TO EDIT
+    - `#race-layout.dashboard-grid` column widths
+    - `.map-container` border/background styling
+    - `.telemetry-horizontal-bar` spacing and height
+    - `.start-light*` colors/glow effects
+    - `.leaderboard-row` typography and spacing
+    ============================================================================= */
 
 /* ── Race grid layout ── */
 #race-layout {

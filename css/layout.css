@@ -1,6 +1,22 @@
-/* ─────────────────────────────────────────────────────────────────────────────
-   Layout  –  dashboard grids, columns, panels, profile card.
-   ─────────────────────────────────────────────────────────────────────────── */
+/* =============================================================================
+    css/layout.css  —  Page structure and panel positioning.
+
+    WHAT THIS FILE CONTROLS
+    - Main grid/column layout
+    - Shared panel shells (cards/containers)
+    - Scroll containers used across tabs
+    - Profile card placement and spacing
+
+    SAFE THINGS TO EDIT
+    - `.dashboard-grid` column widths
+    - `.dash-column` spacing/borders
+    - `.panel` background/border radius
+    - `.player-profile-card` visual treatment
+
+    TIP
+    Layout rules define WHERE things go. Visual details usually belong in the
+    feature/component files.
+    ============================================================================= */
 .dashboard-grid {
     display: grid;
     grid-template-columns: 320px 360px 1fr;

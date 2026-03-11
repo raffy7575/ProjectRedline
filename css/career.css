@@ -1,6 +1,19 @@
-/* ─────────────────────────────────────────────────────────────────────────────
-   Career  –  leagues, events, standings, inspection, rivals.
-   ─────────────────────────────────────────────────────────────────────────── */
+/* =============================================================================
+    css/career.css  —  Career tab visuals.
+
+    WHAT THIS FILE CONTROLS
+    - League header blocks and state badges
+    - Event cards (open/completed/locked states)
+    - Inspection summary badges (pass/fail)
+    - Standings table rows + player highlight
+    - Rival intel panel
+
+    SAFE THINGS TO EDIT
+    - Color themes for league/event state badges
+    - Standings grid widths (`grid-template-columns`)
+    - Rival card border/accent color
+    - Font sizes for dense data readability
+    ============================================================================= */
 .track-event-box {
     background-color: var(--surface-0);
     border: 1px solid var(--clr-green);

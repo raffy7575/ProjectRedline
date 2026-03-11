@@ -3,6 +3,23 @@
   "version": "0.1.0",
   "description": "Street Racing League – browser MMORPG prototype",
   "private": true,
+  "x-maintainer-notes": {
+    "what-this-file-does": "Defines project metadata, npm scripts, and dependencies.",
+    "safe-to-change": [
+      "scripts.dev/build/preview commands",
+      "version when releasing",
+      "description/repository/homepage metadata"
+    ],
+    "do-not-remove": [
+      "vite in devDependencies",
+      "terser in devDependencies"
+    ],
+    "script-meanings": {
+      "dev": "Start local development server with fast reload",
+      "build": "Create production bundle in dist/",
+      "preview": "Serve dist/ locally to test production output"
+    }
+  },
   "scripts": {
     "dev": "vite",
     "build": "vite build",

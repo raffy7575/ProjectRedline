@@ -1,6 +1,18 @@
-/* ─────────────────────────────────────────────────────────────────────────────
-   Components  –  buttons, car grid/cards, stat bars.
-   ─────────────────────────────────────────────────────────────────────────── */
+/* =============================================================================
+    css/components.css  —  Shared reusable UI components.
+
+    WHAT THIS FILE CONTROLS
+    - Generic buttons (`button`, `.action-btn`)
+    - Car card row layout (`.car-grid`)
+    - Car card visuals (`.car-card`)
+    - Generic stat bars used in multiple places
+
+    SAFE THINGS TO EDIT
+    - Button colors/hover styles
+    - Car card width (`220px`) and spacing
+    - Border/selection highlight styles
+    - Stat bar height/colors
+    ============================================================================= */
 
 /* ── Buttons ── */
 button {

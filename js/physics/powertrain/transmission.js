@@ -1,4 +1,16 @@
-// Powertrain Physics - Gears, Ratios, RPM, Clutch, and Rev Limiter
+/* =============================================================================
+    js/physics/powertrain/transmission.js  —  Drivetrain math and RPM behavior
+
+    WHAT THIS FILE DOES
+    - Computes effective gear ratios
+    - Handles shift time, clutch engagement, rev limiter behavior
+    - Computes delivered engine torque and engine braking
+
+    SAFE THINGS TO EDIT
+    - Shift timing multipliers in `getShiftTimeForState()`
+    - Rev limiter softness in `handleRevLimiter()`
+    - Launch clutch response in `updateLaunchClutch()`
+    ============================================================================= */
 
 function getEffectiveGearRatio(physics, gearIdx) {
     let base = physics.gearRatios[Math.max(0, Math.min(gearIdx, physics.gearRatios.length - 1))] || 1.0;

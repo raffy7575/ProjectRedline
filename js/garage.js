@@ -1,4 +1,25 @@
+/* =============================================================================
+     js/garage.js  —  Player hub UI (garage, tabs, maintenance, tuning, skills)
+
+     WHAT THIS FILE DOES
+     - Initializes non-race UI sections after state load
+     - Controls tab switching and feature locks
+     - Builds garage cards and selected-car stat panel
+     - Handles wear/maintenance costs + repairs
+     - Builds tuning shop and driver skill tree
+
+     SAFE THINGS TO TUNE
+     - Tab lock messages in `openTab()` / `updateTabGates()`
+     - Repair rates in `getRepairCost()`
+     - Shop/skill card text and ordering in builders
+
+     CAUTION
+     - This file writes HTML strings with `onclick="..."`; if you rename a
+         function, update both the function name and every corresponding HTML call.
+     ============================================================================= */
+
 function completeInitialization() {
+        // Runs once after save/profile state is loaded.
     updateHUD();
     buildGarage();
     renderCareerMode();
@@ -14,6 +35,7 @@ function completeInitialization() {
 }
 
 function openTab(tabId, btn) {
+    // Central tab router. Also enforces feature-gated tabs.
     // Gate: block locked tabs with explicit user feedback
     if (tabId === 'tab-tuning' && typeof isFeatureUnlocked === 'function' && !isFeatureUnlocked('tuning')) {
         alert('Tuning Shop unlocks at Semi-Pro League (Class C)');
@@ -62,6 +84,7 @@ function updateTabGates() {
 }
 
 function updateHUD() {
+    // Keeps top HUD + race overlay name/money in sync with player data.
     document.getElementById('player-name').innerText = playerData.name || 'Driver';
     document.getElementById('overlay-player-name').innerText = playerData.name || 'Driver';
     document.getElementById('player-money').innerText = playerData.money.toLocaleString();
@@ -72,6 +95,7 @@ function clampCondition(value) {
 }
 
 function getCarCondition(carId) {
+    // Lazily creates default condition state for newly owned cars.
     if (!playerData.carCondition || typeof playerData.carCondition !== 'object') {
         playerData.carCondition = {};
     }
@@ -88,6 +112,7 @@ function getCarCondition(carId) {
 }
 
 function getConditionWearFactors(condition) {
+    // Converts condition % into stat multipliers used when building live stats.
     let engine = condition.engine / 100;
     let tires = condition.tires / 100;
     let suspension = condition.suspension / 100;
@@ -154,6 +179,7 @@ function repairAllComponents() {
 }
 
 function buildMaintenancePanel() {
+    // Renders the wear/repair panel for currently selected car.
     let panel = document.getElementById('maintenance-panel');
     if (!panel) return;
 
@@ -209,6 +235,7 @@ function buildMaintenancePanel() {
 }
 
 function getCarStats(car, options = {}) {
+    // Computes final displayed stats = base + upgrades, then optional wear penalty.
     let applyWear = options.applyWear !== false;
     let stats = { ...car.baseStats };
     car.upgrades.forEach(upgradeId => {
@@ -351,6 +378,7 @@ function buildRivalIntelHTML(activeLeague) {
 }
 
 function renderCareerMode() {
+    // Rebuilds career events + standings panel from current progression state.
     ensureCareerProgress();
 
     let standingsContainer = document.getElementById('career-standings-panel');
@@ -465,6 +493,7 @@ function renderCareerMode() {
 }
 
 function buildGarage() {
+    // Rebuilds owned-car cards and auto-selects first car if nothing selected.
     const ownedGrid = document.getElementById('owned-car-grid');
     if (!ownedGrid) return;
 
@@ -551,6 +580,7 @@ function generateStatHTML(label, totalVal, baseVal) {
 }
 
 function selectCar(car) {
+    // Sets active car context for race readiness, stats sidebar, and maintenance.
     selectedPlayerCar = car;
     saveGameState();
     buildGarage();
@@ -575,6 +605,7 @@ function selectCar(car) {
 }
 
 function buildTuningShop() {
+    // Builds upgrade store for currently selected car.
     const shopDiv = document.getElementById('tuning-categories');
     if (!selectedPlayerCar) {
         shopDiv.innerHTML = '';
@@ -627,6 +658,7 @@ function buildTuningShop() {
 }
 
 function buyUpgrade(itemId, cost) {
+    // Purchases and applies one upgrade to selected car.
     if (playerData.money >= cost && selectedPlayerCar) {
         playerData.money -= cost;
         selectedPlayerCar.upgrades.push(itemId);
@@ -640,6 +672,7 @@ function buyUpgrade(itemId, cost) {
 }
 
 function buildSkillTree() {
+    // Renders skill cards from `playerData.skills` object.
     const grid = document.getElementById('skill-grid');
     grid.innerHTML = '';
 
@@ -671,6 +704,7 @@ function buildSkillTree() {
 }
 
 function buySkill(skillKey) {
+    // Purchases one skill level if affordable and below max.
     let skill = playerData.skills[skillKey];
     let cost = skill.baseCost * (skill.level + 1);
 

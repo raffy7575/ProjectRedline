@@ -1,3 +1,22 @@
+/* =============================================================================
+     js/race-render.js  —  Visual rendering layer for track + cars
+
+     WHAT THIS FILE DOES
+     - Builds deterministic visual theme from track name/surface mix
+     - Draws track backdrop/surface/start line
+     - Draws decorative props (trees, rocks, puddles, banners, cones)
+     - Draws race cars and motion effects each frame
+
+     SAFE THINGS TO TUNE
+     - Color palettes in `getTrackVisualTheme()`
+     - Decor frequency in `drawTracksideDecor()`
+     - Track stroke widths/colors in `renderTrack()`
+
+     NOTE
+     - This file affects visuals only. Race outcomes are decided by
+         physics/simulation files, not by drawing styles.
+     ============================================================================= */
+
 function hashTrackSeed(input) {
     let hash = 2166136261;
     for (let i = 0; i < input.length; i++) {
@@ -16,6 +35,7 @@ function createSeededRandom(seed) {
 }
 
 function getTrackVisualTheme() {
+    // Picks a color theme based on track name + tarmac/dirt ratios.
     let name = (currentTrack?.name || '').toLowerCase();
     let dirt = currentTrack?.dirt || 0;
     let tarmac = currentTrack?.tarmac || 0;
@@ -221,6 +241,7 @@ function drawSkidMarks(ctx) {
 }
 
 function drawTracksideDecor(ctx, theme) {
+    // Places deterministic random decor so each track feels unique but stable.
     let rng = createSeededRandom(hashTrackSeed(`${currentTrack.name}:decor`));
     let dirtHeavy = (currentTrack.dirt || 0) > 0.5;
     let forestHeavy = (currentTrack.tarmac || 0) > 0.4 && (currentTrack.dirt || 0) < 0.7;
@@ -381,6 +402,9 @@ function drawTrackStartLine(ctx) {
 function renderTrack(ctx) {
     if (trackPath.length < 2) return;
 
+    // Current style is intentionally minimal "neon line" for clarity.
+    // Replace this section with drawTrackBackdrop/drawTrackSurface if you
+    // want the richer scenic style.
     // Minimal classic style: clean background + green racing line only.
     ctx.fillStyle = '#0e1510';
     ctx.fillRect(0, 0, CANVAS_W, CANVAS_H);
@@ -404,6 +428,7 @@ function renderTrack(ctx) {
 }
 
 function renderCars(ctx) {
+    // Draws each racer at interpolated progress position along the path.
     raceState.forEach(state => {
         if (!state || !state.car || !trackPath.length) return;
         let pathLen = trackPath.length;

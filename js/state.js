@@ -1,3 +1,22 @@
+/* =============================================================================
+	 js/state.js  —  Global runtime state + simulation constants
+
+	 WHAT THIS FILE DOES
+	 - Holds mutable runtime state used across many files (selected car, race flags,
+		 animation frame id, timing, active event, etc.)
+	 - Defines shared simulation constants used by physics/render systems
+
+	 SAFE THINGS TO EDIT
+	 - Tuning constants (with small increments + testing):
+			 `TIME_MULTIPLIER`, `MAX_FRAME_DT`, `SKIP_SIM_SPEED`,
+			 `BRAKE_DISTANCE_SAFETY_MARGIN`, `CURVE_SPEED_SAFETY_MARGIN`
+
+	 CAUTION
+	 - These are globals consumed by multiple files. Renaming a variable here
+		 requires updating every reference everywhere.
+	 ============================================================================= */
+
+// ── Mutable runtime state ────────────────────────────────────────────────────
 let selectedPlayerCar = null;
 let raceState = [];
 let animationId;
@@ -9,6 +28,7 @@ let currentRaceEvent = null;
 let isSkippingSimulation = false;
 let isFastForwardingNow = false;
 
+// ── Canvas / simulation constants ────────────────────────────────────────────
 const CANVAS_W = 1920;
 const CANVAS_H = 1080;
 const TIME_MULTIPLIER = 1.0;

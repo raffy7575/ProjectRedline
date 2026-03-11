@@ -1,6 +1,18 @@
-/* ─────────────────────────────────────────────────────────────────────────────
-   RPM Dashboard  –  gear display, RPM bar, speed badge, shift light, animations.
-   ─────────────────────────────────────────────────────────────────────────── */
+/* =============================================================================
+    css/rpm.css  —  RPM/gear/speed dashboard widget.
+
+    WHAT THIS FILE CONTROLS
+    - RPM card shell and internal grid
+    - Gear number display
+    - RPM bar + guide lines + labels
+    - Shift-light and redline blink animations
+
+    SAFE THINGS TO EDIT
+    - `.gear-num` font size
+    - `.rpm-bar-bg` height and border radius
+    - `.dashboard-speed-badge` style
+    - Animation intensity in `@keyframes` blocks
+    ============================================================================= */
 .player-rpm-card {
     margin-top: 0;
     background: #101010;

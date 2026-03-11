@@ -1,30 +1,39 @@
-/* ─────────────────────────────────────────────────────────────────────────────
-   main.css  –  import chain. Order matters for cascade.
+/* ═════════════════════════════════════════════════════════════════════════════
+   css/main.css  —  The master CSS file. This is the ONLY file you link to.
+                    All other CSS files are pulled in via @import below.
 
-   1. tokens       – CSS custom properties (must be first)
-   2. base         – body, typography, scrollbars, focus
-   3. nav          – HUD, tabs
-   4. layout       – grids, columns, panel, profile card
-   5. components   – buttons, car cards, stat bars
-   6. maintenance  – service panel, condition bars
-   7. career       – leagues, events, standings, rivals
-   8. dealership   – dealer grid, badges, animations
-   9. shop-skills  – tuning shop, skill tree, earnings
-  10. race         – race layout, canvas, telemetry, leaderboard
-  11. rpm          – RPM dashboard, gear display, shift light
-  12. modals       – overlays, name entry, results
-  13. responsive   – breakpoints, reduced-motion
-   ─────────────────────────────────────────────────────────────────────────── */
-@import './tokens.css';
-@import './base.css';
-@import './nav.css';
-@import './layout.css';
-@import './components.css';
-@import './maintenance.css';
-@import './career.css';
-@import './dealership.css';
-@import './shop-skills.css';
-@import './race.css';
-@import './rpm.css';
-@import './modals.css';
-@import './responsive.css';
+   WHAT IS THIS FILE?
+   Think of it as a table of contents for all the game's styles.
+   The browser (or Vite during a build) reads this file first, then fetches
+   every file listed in the @import lines below, in order.
+
+   WHY DOES ORDER MATTER?
+   CSS is applied top to bottom.  A rule in a later file can override a rule
+   in an earlier file.  The order below is intentional:
+     • tokens  must be first — everything else uses its variables
+     • base    resets the page before anything is drawn
+     • …the rest layer on top in feature order
+
+   HOW TO ADD A NEW CSS FILE
+   1. Create the file in this css/ folder, e.g. css/inventory.css
+   2. Add one line here:   @import './inventory.css';
+   3. Put it AFTER components.css and BEFORE responsive.css
+
+   HOW TO TEMPORARILY HIDE A SECTION'S STYLES
+   Comment out its @import line with /* ... *\/  (won't affect the game logic,
+   just hides the styling — useful for debugging layout issues)
+   ═════════════════════════════════════════════════════════════════════════════ */
+
+@import './tokens.css';       /* 1. CSS variables — colors, sizes, speeds — MUST be first */
+@import './base.css';         /* 2. Body, fonts, scrollbars, focus ring */
+@import './nav.css';          /* 3. Top HUD bar and the tab strip */
+@import './layout.css';       /* 4. Page grid, columns, panels, profile card */
+@import './components.css';   /* 5. Buttons, car cards, stat bars */
+@import './maintenance.css';  /* 6. Service / repair panel */
+@import './career.css';       /* 7. Leagues, events, standings, rivals */
+@import './dealership.css';   /* 8. Car dealer grid, badges, animations */
+@import './shop-skills.css';  /* 9. Tuning shop and skill tree */
+@import './race.css';         /* 10. Race screen, canvas, telemetry, leaderboard */
+@import './rpm.css';          /* 11. RPM dashboard, gear display, shift light */
+@import './modals.css';       /* 12. Popups — name entry, race results, overlays */
+@import './responsive.css';   /* 13. Mobile/small screen overrides — MUST be last */

@@ -1,3 +1,22 @@
+/* =============================================================================
+    save.js  —  Save/load and first-run initialization flow
+
+    WHAT THIS FILE DOES
+    - Persists player state into `localStorage`
+    - Restores saves safely with defensive defaults
+    - Handles player name modal flow on first launch
+    - Boots UI via `initializePersistentState()`
+
+    SAFE THINGS TO EDIT
+    - Save key (`SAVE_KEY`) when doing a breaking save schema update
+    - Name validation rules in `sanitizePlayerName()`
+    - Save payload fields in `buildSavePayload()`
+
+    CAUTION
+    - If you remove/rename payload keys, old saves may fail to load.
+    - Bump version + add migration guards for schema changes.
+    ============================================================================= */
+
 const SAVE_KEY = 'projectRedlineSaveV1';
 const BASE_SKILLS_TEMPLATE = JSON.parse(JSON.stringify(playerData.skills));
 
@@ -42,6 +61,7 @@ function askPlayerName(initialName) {
 }
 
 function buildSavePayload() {
+    // Collect current runtime state into a serializable object.
     const carsUpgrades = {};
     cars.forEach(car => {
         carsUpgrades[car.id] = Array.isArray(car.upgrades) ? [...car.upgrades] : [];
@@ -65,6 +85,7 @@ function buildSavePayload() {
 }
 
 function saveGameState() {
+    // Writes payload to browser localStorage.
     try {
         const payload = buildSavePayload();
         localStorage.setItem(SAVE_KEY, JSON.stringify(payload));
@@ -74,6 +95,7 @@ function saveGameState() {
 }
 
 function loadGameState() {
+    // Reads and validates saved data, then hydrates in-memory game state.
     try {
         const raw = localStorage.getItem(SAVE_KEY);
         if (!raw) return false;
@@ -179,6 +201,7 @@ function loadGameState() {
 }
 
 function initializePersistentState() {
+    // App startup entry for persistence: load if available, otherwise prompt name.
     const loaded = loadGameState();
 
     if (!loaded) {

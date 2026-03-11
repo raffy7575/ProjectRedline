@@ -1,13 +1,17 @@
-# Node
+# WHAT THIS FILE DOES
+# Prevents generated/local machine files from being committed to git.
+# You can add more patterns as the project grows.
+
+# Node / npm generated folders and logs
 node_modules/
 npm-debug.log*
 
-# Vite build output
+# Vite build output (recreated by `npm run build`)
 dist/
 
-# macOS
+# macOS system file
 .DS_Store
 
-# Editor
+# Editor-local settings (machine-specific)
 .vscode/settings.json
 *.swp

@@ -4,9 +4,22 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Street Racing League - Pro Simulator</title>
+        <!--
+            CSS ENTRY POINT
+            - Keep this pointing to css/main.css.
+            - main.css imports all other CSS files in order.
+            - In production, Vite turns that chain into one minified hashed CSS file.
+        -->
     <!-- css/main.css works offline (browser resolves @imports) AND is
          bundled by Vite into a single hashed file in production. -->
     <link rel="stylesheet" href="css/main.css">
+
+        <!--
+            VITE ENTRY POINT
+            - This tells Vite where module processing starts.
+            - Keep this even while classic <script src="..."> tags exist below.
+            - Future JS module migration will happen through src/main.js.
+        -->
     <script type="module" src="/src/main.js"></script>
 </head>
 <body>
@@ -149,7 +162,12 @@
         </div>
     </div>
 
-    <script src="data.js"></script>
+        <!--
+            CLASSIC SCRIPT LOAD ORDER (IMPORTANT)
+            These files still run in global scope. Order matters.
+            If you move lines around, functions may become undefined at runtime.
+        -->
+        <script src="data.js"></script>
     <script src="js/state.js"></script>
     <script src="save.js"></script>
     <script src="js/utils.js"></script>
@@ -159,14 +177,14 @@
     <script src="js/garage.js"></script>
     <script src="js/dealership.js"></script>
     
-    <!-- Physics Domain Modules -->
+    <!-- Physics Domain Modules (used by race simulation) -->
     <script src="js/physics/tires/model.js"></script>
     <script src="js/physics/aero/aerodynamics.js"></script>
     <script src="js/physics/powertrain/transmission.js"></script>
     <script src="js/physics/powertrain/gearbox.js"></script>
     <script src="js/physics/forces/longitudinal.js"></script>
     
-    <!-- Core Simulation & Rendering -->
+    <!-- Core Simulation & Rendering (keep these last among race dependencies) -->
     <script src="js/race-physics.js"></script>
     <script src="js/race-render.js"></script>
     <script src="js/race.js"></script>

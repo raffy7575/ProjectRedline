@@ -1,6 +1,19 @@
-/* ─────────────────────────────────────────────────────────────────────────────
-   Responsive  –  breakpoints and reduced-motion guard.
-   ─────────────────────────────────────────────────────────────────────────── */
+/* =============================================================================
+    css/responsive.css  —  Screen-size and accessibility overrides.
+
+    WHAT THIS FILE CONTROLS
+    - Layout adjustments at 1366px, 1100px, and 720px breakpoints
+    - Compact/mobile behavior
+    - Reduced-motion fallback for accessibility
+
+    SAFE THINGS TO EDIT
+    - Add new breakpoints for specific device targets
+    - Tweak spacing/font sizes inside each `@media` block
+    - Keep `prefers-reduced-motion` block intact for accessibility compliance
+
+    IMPORTANT
+    This file should stay LAST in css/main.css import order so overrides win.
+    ============================================================================= */
 
 /* ── Narrow race sidebar ── */
 @media (max-width: 1366px) {

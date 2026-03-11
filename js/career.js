@@ -1,3 +1,23 @@
+/* =============================================================================
+    js/career.js  —  Career progression rules and championship bookkeeping
+
+    WHAT THIS FILE DOES
+    - Creates/normalizes career save structure (`ensureCareerProgress()`)
+    - Defines feature gates by league tier (`isFeatureUnlocked()`)
+    - Validates event eligibility (tech inspection / restrictions)
+    - Tracks event completion, best finish, and points standings
+    - Unlocks next league when current one is completed
+
+    SAFE THINGS TO EDIT
+    - `FEATURE_REQUIREMENTS` to move feature unlock timing
+    - Default points table in `getLeaguePointsTable()`
+    - Restriction labels in `getRestrictionLabel()`
+
+    CAUTION
+    - Changing save-shape keys requires migration logic for old saves.
+    - Keep `ensureCareerProgress()` defensive checks intact.
+    ============================================================================= */
+
 function ensureCareerProgress() {
     if (!playerData.careerProgress || typeof playerData.careerProgress !== 'object') {
         playerData.careerProgress = {
@@ -70,6 +90,7 @@ const FEATURE_REQUIREMENTS = {
 };
 
 function getHighestUnlockedTier() {
+    // Returns the highest league tier the player has unlocked so far.
     let progress = ensureCareerProgress();
     let unlockedLeagueIds = Array.isArray(progress.unlockedLeagueIds) ? progress.unlockedLeagueIds : [];
     let maxTier = 1;
@@ -89,6 +110,7 @@ function getHighestUnlockedLeagueTier() {
 }
 
 function isFeatureUnlocked(featureName) {
+    // Maps aliases + checks whether player's highest unlocked tier meets requirement.
     const aliases = {
         tuningShop: 'tuning',
         aiUpgrades: 'ai_upgrades',
@@ -193,6 +215,7 @@ function ensureDriverStanding(leagueId, driverId, driverName) {
 }
 
 function getLeagueStandings(leagueId) {
+    // Returns standings sorted by points, then wins, then best finish.
     let standings = ensureLeagueStandings(leagueId);
     let entries = Object.values(standings);
     if (!entries.find(e => e.driverId === 'player')) {
@@ -314,6 +337,8 @@ function unlockNextLeagueIfEligible(completedLeagueId) {
 }
 
 function recordCareerRaceResult(eventId, finishingPosition, sortedRacers) {
+    // Core persistence method called when a race ends in career mode.
+    // Updates completion flags, best position, points, and potential unlocks.
     let context = getCareerEventContext(eventId);
     if (!context) {
         return { eventCompleted: false, targetMet: false, leagueCompleted: false, unlockedLeagueId: null, pointsAwarded: 0 };
@@ -462,6 +487,7 @@ function normalizeCarForInspection(car) {
 }
 
 function validateCarForEvent(car, event) {
+    // Tech inspection gate: checks car against event restriction rules.
     let targetCar = car || selectedPlayerCar;
     let restrictions = event?.restrictions || {};
     let normalizedCar = normalizeCarForInspection(targetCar);

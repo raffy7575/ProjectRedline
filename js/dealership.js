@@ -1,3 +1,23 @@
+/* =============================================================================
+    js/dealership.js  —  Stock + rotating special-offer dealership system
+
+    WHAT THIS FILE DOES
+    - Defines procedural generator inputs (name parts, colors, archetypes)
+    - Builds deterministic 15-minute rotating inventory from seed
+    - Renders stock section and special-offer cards
+    - Handles purchases and persistence for dealer-only cars
+
+    SAFE THINGS TO EDIT
+    - Rotation cadence: `DEALER_WINDOW_MS`
+    - Archetype ranges/colors in `DEALER_ARCHETYPES`
+    - Price formula in `_generateDealerCar()`
+    - Countdown text in `updateDealerCountdown()`
+
+    CAUTION
+    - Generated IDs include seed window; changing ID format can affect save links.
+    - Keep purchase flow updates (`playerData`, `cars`, save) in sync.
+    ============================================================================= */
+
 // ─── Procedural Dealership ────────────────────────────────────────────────────
 
 const DEALER_WINDOW_MS = 15 * 60 * 1000; // 15-minute rotation window
@@ -81,6 +101,7 @@ function _generateGearRatios(rng, numGears) {
 }
 
 function _generateDealerCar(rng, index, seedKey) {
+    // Creates one procedural car card with stats + physics data.
     // Name
     let prefix    = _rpick(rng, DEALER_PREFIXES);
     let model     = _rpick(rng, DEALER_MODELS);
@@ -144,6 +165,7 @@ function getDealerSeedKey() {
 }
 
 function getDealerInventory() {
+    // Cached by 15-minute seed so offers remain stable within each window.
     let seed = getDealerSeedKey();
     if (seed !== _dealerCache.seed) {
         _dealerCache.seed = seed;
@@ -240,6 +262,7 @@ function _buildDealerCard(car, buyFn) {
 }
 
 function buildDealership() {
+    // Rebuild both dealership sections: fixed stock + rotating special offers.
     // ── Stock section (fixed cars not yet owned) ──────────────────────────────
     const stockGrid = document.getElementById('stock-car-grid');
     if (stockGrid) {
@@ -288,6 +311,7 @@ function buildDealership() {
 // ── Purchase ──────────────────────────────────────────────────────────────────
 
 function buyDealerCar(carId) {
+    // Purchase flow for generated special-offer vehicles.
     let inventory = getDealerInventory();
     let car = inventory.find(c => c.id === carId);
     if (!car || playerData.money < car.price) return;

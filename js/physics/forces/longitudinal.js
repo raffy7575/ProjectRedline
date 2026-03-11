@@ -1,4 +1,15 @@
-// Longitudinal Forces - Acceleration, Deceleration, Braking
+/* =============================================================================
+    js/physics/forces/longitudinal.js  —  Forward/backward force application
+
+    WHAT THIS FILE DOES
+    - Converts torque into wheel force and acceleration
+    - Applies passive decel (drag + engine brake)
+    - Applies driver braking and clamps minimum speed
+
+    SAFE THINGS TO EDIT
+    - Brake ramp response in `applyLongitudinalForces()`
+    - Engine brake intensity in `applyEngineBrake()` (powertrain)
+    ============================================================================= */
 
 function applyLongitudinalForces(state, dt, physics, drivetrainData) {
     let engineTorque = calculateTorqueDelivery(state, physics);

@@ -1,3 +1,19 @@
+/* =============================================================================
+    js/ai-career.js  —  Rival AI economy, upgrades, and event loadouts
+
+    WHAT THIS FILE DOES
+    - Stores per-rival progression state in save data
+    - Awards AI income after events
+    - Lets rivals buy upgrades based on build bias + event demands
+    - Builds legal event loadouts under restriction rules
+    - Generates rival intel feed shown in Career UI
+
+    SAFE THINGS TO EDIT
+    - AI income scaling in `getLeagueEconomyIncome()`
+    - Purchase aggressiveness thresholds in `evaluatePurchaseForRival()`
+    - Bias weights in `getBiasWeights()`
+    ============================================================================= */
+
 function ensureAiCareerState() {
     ensureCareerProgress();
 
@@ -159,6 +175,7 @@ function scoreStatsForEvent(stats, event, buildBias) {
 }
 
 function selectBestLegalLoadout(baseCar, ownedUpgradeIds, event, buildBias, riskTolerance) {
+    // Greedy builder: picks legal upgrades that improve event score.
     let allItems = flattenShopItems();
     let legalSet = [];
     let bestStats = applyUpgradeIdsToBaseStats(baseCar, legalSet);
@@ -261,6 +278,7 @@ function getNextEventInLeague(leagueId, eventId) {
 }
 
 function advanceAiAfterEvent(leagueId, eventId) {
+    // Main progression step called once per completed event.
     let aiState = initializeAiCareerState();
     let league = leagues.find(x => x.id === leagueId);
     if (!league) return [];

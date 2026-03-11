@@ -1,6 +1,18 @@
-/* ─────────────────────────────────────────────────────────────────────────────
-   Shop & Skills  –  tuning shop, skill tree, earnings, panel utilities.
-   ─────────────────────────────────────────────────────────────────────────── */
+/* =============================================================================
+   css/shop-skills.css  —  Tuning Shop + Driver Skills tabs.
+
+   WHAT THIS FILE CONTROLS
+   - Shop category cards and item rows
+   - Skill cards and level display
+   - Earnings summary box styling
+   - Shared helper text styles for these tabs
+
+   SAFE THINGS TO EDIT
+   - `.shop-grid` columns (currently 2)
+   - `.skill-level` font size/color
+   - `.earnings-box` look and spacing
+   - `.panel-description` muted helper text style
+   ============================================================================= */
 .shop-category { margin-top: 25px; border: 1px solid var(--border); border-radius: var(--radius-sm); overflow: hidden; }
 .shop-cat-title { background-color: var(--surface-3); color: #fff; padding: 10px 15px; font-weight: bold; }
 .shop-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background-color: var(--surface-3); }

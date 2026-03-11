@@ -1,3 +1,25 @@
+/* =============================================================================
+    data.js  —  Core game content database (player defaults, cars, shop, tracks)
+
+    WHAT THIS FILE DOES
+    - Defines initial player profile template (`playerData`)
+    - Declares starter cars and physics/stats metadata (`cars`)
+    - Defines upgrade catalog (`shopItems`)
+    - Defines tracks and waypoints (`tracks`)
+    - Declares AI rivals and career leagues/events
+
+    SAFE THINGS TO EDIT
+    - Car prices/colors/base stats in `cars`
+    - Upgrade costs/boosts in `shopItems`
+    - Track lap counts and waypoint layouts in `tracks`
+    - League rewards/restrictions in `leagues`
+
+    CAUTION
+    - IDs are references across many files and saves. Keep IDs stable once used.
+    - Large stat jumps can break race balance; tune in small steps.
+    ============================================================================= */
+
+// ── Player default profile ───────────────────────────────────────────────────
 let playerData = { 
     name: 'Driver',
     money: 10000, 
@@ -23,6 +45,7 @@ let playerData = {
     }
 };
 
+// ── Starter + persistent car catalog ─────────────────────────────────────────
 const cars = [
     { 
         id: 'c1', 
@@ -80,6 +103,7 @@ const cars = [
     }
 ];
 
+// ── Upgrade catalog (grouped by shop category) ──────────────────────────────
 const shopItems = {
     engine: [
         { id: 'eng1', name: 'Sport Air Filter', cost: 300, boosts: { acceleration: 5 } },
@@ -112,6 +136,7 @@ const shopItems = {
     ]
 };
 
+// ── Track definitions + waypoint layouts ─────────────────────────────────────
 const tracks = [
     { id: 't1', name: "Hammerhead", laps: 7, tarmac: 1.0, dirt: 0.0, waypoints: [ {x:0.1, y:0.2}, {x:0.8, y:0.2}, {x:0.9, y:0.4}, {x:0.7, y:0.6}, {x:0.9, y:0.8}, {x:0.5, y:0.9}, {x:0.4, y:0.6}, {x:0.2, y:0.7}, {x:0.1, y:0.5} ] },
     { id: 't2', name: "The Serpent", laps: 5, tarmac: 0.9, dirt: 0.1, waypoints: [ {x:0.2, y:0.1}, {x:0.8, y:0.1}, {x:0.8, y:0.3}, {x:0.2, y:0.4}, {x:0.2, y:0.6}, {x:0.8, y:0.7}, {x:0.8, y:0.9}, {x:0.1, y:0.9}, {x:0.05, y:0.5} ] },
@@ -119,6 +144,7 @@ const tracks = [
     { id: 't4', name: "Muddy Canyon", laps: 4, tarmac: 0.2, dirt: 0.8, waypoints: [ {x:0.1, y:0.8}, {x:0.2, y:0.2}, {x:0.8, y:0.2}, {x:0.9, y:0.8}, {x:0.5, y:0.5} ] } 
 ];
 
+// ── Named AI rivals (mapped to car IDs) ──────────────────────────────────────
 const aiRivals = [
     {
         id: 'rival-ember',
@@ -143,6 +169,7 @@ const aiRivals = [
     }
 ];
 
+// ── Career league ladder and event policies ──────────────────────────────────
 const leagues = [
     {
         id: 'league-amateur',

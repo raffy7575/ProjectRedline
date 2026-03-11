@@ -1,3 +1,24 @@
+/* =============================================================================
+     js/race-physics.js  —  Race simulation brain (math + vehicle behavior)
+
+     WHAT THIS FILE DOES
+     - Builds the race entries for player + AI (`buildRaceState()`)
+     - Generates smooth driveable path from waypoint track data (`generateTrackPath()`)
+     - Computes per-frame physics context (grip, drag, braking, speed limits)
+     - Chooses target speed, applies throttle/brake decisions, handles shifting
+     - Advances each car's simulated state over time
+
+     SAFE THINGS TO TUNE
+     - AI pacing randomness in `createRaceEntry()` (`driverPace`)
+     - Path smoothing density in `generateTrackPath()` (`segments`)
+     - Curve/brake aggressiveness constants used in target speed/inputs functions
+
+     CAUTION
+     - Many values are interdependent. Small changes can create unstable behavior
+         (oscillation, over-braking, impossible top speed).
+     - Prefer tiny edits and test race feel after each change.
+     ============================================================================= */
+
 function createRaceEntry(car, isPlayer, trackTarmac, trackDirt, statsOverride) {
     let activeStats = statsOverride || getCarStats(car, { applyWear: isPlayer });
 
@@ -55,6 +76,8 @@ function createRaceEntry(car, isPlayer, trackTarmac, trackDirt, statsOverride) {
 }
 
 function buildRaceState() {
+    // Rebuilds all active racers whenever a race starts.
+    // Includes player car + all eligible AI entries.
     raceState = [];
     if (!selectedPlayerCar) {
         console.error('buildRaceState: selectedPlayerCar is null. Race cannot start.');
@@ -103,6 +126,8 @@ function buildRaceState() {
 }
 
 function generateTrackPath() {
+    // Converts simple waypoints into a dense Catmull-Rom spline path.
+    // The simulation then drives along this generated path.
     trackPath = [];
     const pts = currentTrack.waypoints;
     const numPts = pts.length;
@@ -148,6 +173,8 @@ function getGapToNextCarAhead(currentState) {
 }
 
 function buildPhysicsContext(state, dt) {
+    // Creates derived values used by multiple physics stages in this frame.
+    // Think: a per-car "physics snapshot" for the current moment.
     const INTERNAL_TO_MS = PROGRESS_SCALE * METERS_PER_PROGRESS_STEP;
     const REDLINE = state.car.redline || 8000;
     const gearRatios = state.car.gearRatios || [1.0];
@@ -208,6 +235,8 @@ function buildPhysicsContext(state, dt) {
 
 
 function computeTargetSpeedData(state, physics, draftWindow) {
+    // Looks ahead along the path and computes safe target speed based on
+    // curvature, braking distance, and drafting opportunities.
     let visionDistanceMeters = (physics.speedMs * 1.5) + ((physics.speedMs * Math.max(1, physics.speedMs)) / (2 * Math.max(1, physics.brakeDecelMs2)));
     let lookAheadPoints = Math.floor((visionDistanceMeters / METERS_PER_PROGRESS_STEP) * PROGRESS_SCALE);
     lookAheadPoints = Math.max(40, Math.min(Math.floor(trackPath.length * 0.75), lookAheadPoints));
@@ -296,6 +325,8 @@ function computeTargetSpeedData(state, physics, draftWindow) {
 }
 
 function applyDriverInputsAndSlip(state, dt, physics, targetData) {
+    // Converts target speed gap into pedal commands (throttle/brake), then
+    // adjusts behavior for slip, wheel lock, and corner urgency.
     let speedError = targetData.targetSpeed - state.speed;
     let speedErrorMs = speedError * physics.INTERNAL_TO_MS;
     let desiredThrottle = 0;
@@ -368,6 +399,8 @@ function applyDriverInputsAndSlip(state, dt, physics, targetData) {
 }
 
 function updateGearboxAndPreForceRpm(state, dt, physics, maxCurveAhead) {
+    // Handles shift decisions and pre-force RPM/clutch behavior.
+    // This stage sets gearbox state before drivetrain forces are applied.
     let currentGearRatio = getEffectiveGearRatio(physics, state.currentGear);
     let wheelRpmReal = (physics.speedMs / (2 * Math.PI * physics.wheelRadius)) * 60;
 

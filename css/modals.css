@@ -1,6 +1,18 @@
-/* ─────────────────────────────────────────────────────────────────────────────
-   Modals  –  overlays, reset dialog, name entry, results panel.
-   ─────────────────────────────────────────────────────────────────────────── */
+/* =============================================================================
+    css/modals.css  —  Full-screen overlays and dialog cards.
+
+    WHAT THIS FILE CONTROLS
+    - Dark page overlay behind dialogs
+    - Name entry and reset modal card style
+    - Modal input styling and focus
+    - Results panel visual elements
+
+    SAFE THINGS TO EDIT
+    - `.modal-overlay` darkness/blur feel
+    - `.name-modal` card size/border/shadow
+    - Button variants (`.btn-danger`, `.btn-secondary`)
+    - Results emphasis (`.earnings-text`)
+    ============================================================================= */
 
 /* ── Base overlay ── */
 .modal-overlay {

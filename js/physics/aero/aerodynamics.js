@@ -1,4 +1,15 @@
-// Aerodynamic Physics - Downforce, Drag, and Air Resistance
+/* =============================================================================
+    js/physics/aero/aerodynamics.js  —  Aerodynamic calculations
+
+    WHAT THIS FILE DOES
+    - Computes downforce and load factor from speed and car aero values
+    - Computes drag deceleration
+    - Estimates drag-limited top speed from power
+
+    SAFE THINGS TO EDIT
+    - Coefficients used for balancing downforce vs drag feel
+    - Default fallbacks for missing car aero properties
+    ============================================================================= */
 
 function calculateAerodynamicContext(state, car, physics) {
     const rhoAir = 1.225; // Air density at sea level

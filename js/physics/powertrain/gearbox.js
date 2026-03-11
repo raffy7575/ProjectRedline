@@ -1,4 +1,15 @@
-// Gearbox Logic - Shift decisions, upshifts, downshifts
+/* =============================================================================
+    js/physics/powertrain/gearbox.js  —  Shift decision rules
+
+    WHAT THIS FILE DOES
+    - Decides when to upshift/downshift based on RPM, throttle, braking, curves
+    - Provides hysteresis to avoid rapid gear hunting
+    - Defines upshift threshold strategy for straights vs corners
+
+    SAFE THINGS TO EDIT
+    - `getUpshiftThreshold()` percentages
+    - Downshift guard conditions in `shouldDownshift*()`
+    ============================================================================= */
 
 function shouldUpshift(state, physics, upshiftThreshold) {
     return state.rpm >= upshiftThreshold 

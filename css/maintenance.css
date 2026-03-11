@@ -1,6 +1,18 @@
-/* ─────────────────────────────────────────────────────────────────────────────
-   Maintenance  –  condition bars, service panel, buy overlay.
-   ─────────────────────────────────────────────────────────────────────────── */
+/* =============================================================================
+    css/maintenance.css  —  Repair/service panel styling.
+
+    WHAT THIS FILE CONTROLS
+    - Maintenance card container
+    - Condition bars + status text
+    - Service/repair action buttons
+    - Buy overlay section inside maintenance flow
+
+    SAFE THINGS TO EDIT
+    - `.condition-fill` gradient colors
+    - `.maintenance-row` column widths
+    - `.maintenance-btn` size/colors
+    - `.buy-btn` accent color
+    ============================================================================= */
 .maintenance-panel {
     margin-top: 14px;
     background: #1c1c1c;

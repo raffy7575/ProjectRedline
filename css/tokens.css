@@ -1,48 +1,98 @@
-/* ─────────────────────────────────────────────────────────────────────────────
-   Design Tokens  –  single source of truth for the entire design system.
-   All other CSS files @import this via css/main.css.
-   ─────────────────────────────────────────────────────────────────────────── */
+/* ═════════════════════════════════════════════════════════════════════════════
+   css/tokens.css  —  Design tokens: the single source of truth for the whole
+                      visual identity of the game.
+
+   WHAT IS THIS FILE?
+   Instead of writing the same colour "#4CAF50" in 50 different places,
+   you define it ONCE here as --clr-green, and every other CSS file uses that
+   name.  Want to change the green?  Change it here — the whole game updates.
+
+   THESE ARE CALLED "CSS CUSTOM PROPERTIES" (or CSS variables).
+   Every name starts with -- and lives inside :root {} so they work everywhere.
+
+   HOW TO CHANGE A COLOUR
+   Just change the hex value on the right, e.g.:
+     --clr-green: #00ff88;   ← any valid CSS colour works
+
+   HOW TO ADD A NEW TOKEN
+   Add a new line inside :root {}, e.g.:
+     --clr-purple: #9c27b0;
+   Then use it anywhere in any CSS file as:  color: var(--clr-purple);
+
+   HOW TO CHANGE SPACING / SIZES
+   --space-1 through --space-5 are used for padding/margin throughout.
+   Changing --space-4: 16px to --space-4: 20px will loosen the whole UI.
+
+   IMPORTANT: This file MUST be the first @import in css/main.css.
+              If it loads after another file, that file won't see the variables.
+   ═════════════════════════════════════════════════════════════════════════════ */
 :root {
-    /* ── Spacing ── */
+
+    /* ── Spacing ──────────────────────────────────────────────────────────────
+       Used for padding and margins throughout the UI.
+       Think of them as t-shirt sizes: 1=XS, 2=S, 3=M, 4=L, 5=XL             */
     --space-1: 4px;
     --space-2: 8px;
     --space-3: 12px;
     --space-4: 16px;
     --space-5: 20px;
 
-    /* ── Border radii ── */
-    --radius-sm: 4px;
-    --radius-md: 6px;
-    --radius-lg: 8px;
+    /* ── Border radii ─────────────────────────────────────────────────────────
+       How rounded the corners of boxes are.
+       Set all three to 0 for a sharp/angular look.
+       Set all three to 12px+ for a very soft/bubbly look.                     */
+    --radius-sm: 4px;    /* small elements: badges, tags */
+    --radius-md: 6px;    /* medium elements: buttons, inputs */
+    --radius-lg: 8px;    /* large elements: cards, panels */
 
-    /* ── Brand / semantic colors ── */
-    --clr-green:       #4CAF50;
-    --clr-green-light: #8BC34A;
-    --clr-red:         #f44336;
-    --clr-blue:        #03A9F4;
-    --clr-yellow:      #FFC107;
+    /* ── Brand / semantic colours ─────────────────────────────────────────────
+       Change these to rebrand the whole game colour palette.
+       "semantic" means each colour has a meaning, not just a look:
+         green  = positive / money / success
+         red    = danger / damage / loss
+         blue   = info / speed / stats
+         yellow = warning / highlight / prize                                   */
+    --clr-green:       #4CAF50;    /* money, go, positive stats */
+    --clr-green-light: #8BC34A;    /* active tab label, money text */
+    --clr-red:         #f44336;    /* damage, danger, loss */
+    --clr-blue:        #03A9F4;    /* info, speed, cooldowns */
+    --clr-yellow:      #FFC107;    /* warning, gold prize, highlight */
 
-    /* ── Surfaces (dark theme) ── */
-    --surface-0: #111;
-    --surface-1: #1a1a2e;
-    --surface-2: #222;
-    --surface-3: #333;
-    --surface-4: #444;
-    --surface-5: #555;
+    /* ── Surfaces (the dark theme background layers) ──────────────────────────
+       0 is the darkest (page background), 5 is the lightest (hover states).
+       Add more levels if you need finer gradations.
+       To make a lighter theme, raise these values toward #ffffff.             */
+    --surface-0: #111;     /* deepest background */
+    --surface-1: #1a1a2e;  /* panel backgrounds */
+    --surface-2: #222;     /* card / button backgrounds */
+    --surface-3: #333;     /* active / selected state */
+    --surface-4: #444;     /* borders, dividers */
+    --surface-5: #555;     /* subtle hover fills */
 
-    /* ── Text ── */
+    /* ── Text colours ─────────────────────────────────────────────────────────
+       primary  = main readable text
+       muted    = less important text (labels, sub-info)
+       dim      = very secondary (placeholders, disabled hints)
+       faint    = barely visible (decorative dividers etc.)                    */
     --text-primary: #f5f5f5;
     --text-muted:   #888;
     --text-dim:     #666;
     --text-faint:   #555;
 
-    /* ── Borders ── */
-    --border:       #333;
-    --border-light: #444;
+    /* ── Borders ──────────────────────────────────────────────────────────────
+       Two border colours for light/subtle variation.                           */
+    --border:       #333;    /* standard border */
+    --border-light: #444;    /* slightly lighter border (hover, focus) */
 
-    /* ── Focus / motion ── */
-    --focus-color:    #ff9800;
-    --motion-fast:    140ms;
-    --motion-mid:     220ms;
-    --ease-standard:  cubic-bezier(0.2, 0, 0, 1);
+    /* ── Focus, motion, and easing ────────────────────────────────────────────
+       --focus-color    : the orange outline ring when you tab-focus a button.
+                          Change to match your brand.
+       --motion-fast/mid: how fast transitions feel (lower = snappier).
+       --ease-standard  : the acceleration curve for transitions.
+                          cubic-bezier values: search "CSS easing visualizer"
+                          to experiment with different feel.                    */
+    --focus-color:   #ff9800;
+    --motion-fast:   140ms;
+    --motion-mid:    220ms;
+    --ease-standard: cubic-bezier(0.2, 0, 0, 1);
 }

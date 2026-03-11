@@ -1,6 +1,22 @@
-/* ─────────────────────────────────────────────────────────────────────────────
-   Base  –  global reset, body, typography, scrollbars, accessibility.
-   ─────────────────────────────────────────────────────────────────────────── */
+/* =============================================================================
+    css/base.css  —  Global defaults for the whole app.
+
+    WHAT THIS FILE CONTROLS
+    - Page background and text color
+    - Default font family
+    - Global body spacing
+    - Keyboard focus ring (accessibility)
+    - Scrollbar look for major scroll areas
+
+    SAFE THINGS TO EDIT
+    - `body` -> `background-color`, `color`, `padding`, `font-family`
+    - Focus ring color comes from `--focus-color` in tokens.css
+    - Scrollbar colors in the `::-webkit-scrollbar*` rules
+
+    TIP
+    Keep this file "global only". Feature-specific styling belongs in the
+    feature files (career.css, race.css, dealership.css, etc.).
+    ============================================================================= */
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background-color: #121212;
