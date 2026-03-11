@@ -1,0 +1,30 @@
+/* ─────────────────────────────────────────────────────────────────────────────
+   main.css  –  import chain. Order matters for cascade.
+
+   1. tokens       – CSS custom properties (must be first)
+   2. base         – body, typography, scrollbars, focus
+   3. nav          – HUD, tabs
+   4. layout       – grids, columns, panel, profile card
+   5. components   – buttons, car cards, stat bars
+   6. maintenance  – service panel, condition bars
+   7. career       – leagues, events, standings, rivals
+   8. dealership   – dealer grid, badges, animations
+   9. shop-skills  – tuning shop, skill tree, earnings
+  10. race         – race layout, canvas, telemetry, leaderboard
+  11. rpm          – RPM dashboard, gear display, shift light
+  12. modals       – overlays, name entry, results
+  13. responsive   – breakpoints, reduced-motion
+   ─────────────────────────────────────────────────────────────────────────── */
+@import './tokens.css';
+@import './base.css';
+@import './nav.css';
+@import './layout.css';
+@import './components.css';
+@import './maintenance.css';
+@import './career.css';
+@import './dealership.css';
+@import './shop-skills.css';
+@import './race.css';
+@import './rpm.css';
+@import './modals.css';
+@import './responsive.css';

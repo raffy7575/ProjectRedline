@@ -1,0 +1,37 @@
+/* ─────────────────────────────────────────────────────────────────────────────
+   Base  –  global reset, body, typography, scrollbars, accessibility.
+   ─────────────────────────────────────────────────────────────────────────── */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #121212;
+    color: #e0e0e0;
+    margin: 0;
+    padding: 20px;
+    box-sizing: border-box;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+h1 { margin: 0 0 20px 0; color: #fff; }
+
+/* ── Global focus ring ── */
+button:focus-visible,
+.tab-btn:focus-visible,
+.reset-icon-btn:focus-visible,
+input:focus-visible {
+    outline: 2px solid var(--focus-color);
+    outline-offset: 2px;
+}
+
+/* ── Scrollbar theming ── */
+.tab-content::-webkit-scrollbar { width: 8px; }
+.tab-content::-webkit-scrollbar-track { background: #1a1a1a; border-radius: 4px; }
+.tab-content::-webkit-scrollbar-thumb { background: var(--border-light); border-radius: 4px; }
+.tab-content::-webkit-scrollbar-thumb:hover { background: var(--focus-color); }
+
+.car-grid::-webkit-scrollbar { height: 5px; }
+.car-grid::-webkit-scrollbar-track { background: #1a1a1a; border-radius: 3px; }
+.car-grid::-webkit-scrollbar-thumb { background: var(--border-light); border-radius: 3px; }
+.car-grid::-webkit-scrollbar-thumb:hover { background: var(--text-dim); }

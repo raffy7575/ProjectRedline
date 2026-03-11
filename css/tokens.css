@@ -1,0 +1,48 @@
+/* ─────────────────────────────────────────────────────────────────────────────
+   Design Tokens  –  single source of truth for the entire design system.
+   All other CSS files @import this via css/main.css.
+   ─────────────────────────────────────────────────────────────────────────── */
+:root {
+    /* ── Spacing ── */
+    --space-1: 4px;
+    --space-2: 8px;
+    --space-3: 12px;
+    --space-4: 16px;
+    --space-5: 20px;
+
+    /* ── Border radii ── */
+    --radius-sm: 4px;
+    --radius-md: 6px;
+    --radius-lg: 8px;
+
+    /* ── Brand / semantic colors ── */
+    --clr-green:       #4CAF50;
+    --clr-green-light: #8BC34A;
+    --clr-red:         #f44336;
+    --clr-blue:        #03A9F4;
+    --clr-yellow:      #FFC107;
+
+    /* ── Surfaces (dark theme) ── */
+    --surface-0: #111;
+    --surface-1: #1a1a2e;
+    --surface-2: #222;
+    --surface-3: #333;
+    --surface-4: #444;
+    --surface-5: #555;
+
+    /* ── Text ── */
+    --text-primary: #f5f5f5;
+    --text-muted:   #888;
+    --text-dim:     #666;
+    --text-faint:   #555;
+
+    /* ── Borders ── */
+    --border:       #333;
+    --border-light: #444;
+
+    /* ── Focus / motion ── */
+    --focus-color:    #ff9800;
+    --motion-fast:    140ms;
+    --motion-mid:     220ms;
+    --ease-standard:  cubic-bezier(0.2, 0, 0, 1);
+}

@@ -1,0 +1,162 @@
+/* ─────────────────────────────────────────────────────────────────────────────
+   Career  –  leagues, events, standings, inspection, rivals.
+   ─────────────────────────────────────────────────────────────────────────── */
+.track-event-box {
+    background-color: var(--surface-0);
+    border: 1px solid var(--clr-green);
+    border-left: 4px solid var(--clr-green);
+    padding: 15px;
+    border-radius: var(--radius-sm);
+    color: #fff;
+    font-size: 1.1em;
+    font-weight: bold;
+}
+
+.career-mode-panel { margin-bottom: 20px; }
+
+/* ── League block ── */
+.league-block { margin-bottom: 14px; }
+.league-block.league-locked { opacity: 0.75; }
+
+.league-header {
+    background: linear-gradient(135deg, #10161a 0%, #1a2b2f 55%, #121212 100%);
+    border: 1px solid #2f4b51;
+    border-left: 5px solid var(--clr-blue);
+    border-radius: var(--radius-sm);
+    padding: 14px;
+    margin-bottom: 12px;
+}
+.league-class {
+    display: inline-block;
+    background: var(--clr-blue);
+    color: #081219;
+    font-size: 0.7em;
+    font-weight: 900;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    padding: 3px 8px;
+    border-radius: 2px;
+    margin-bottom: 8px;
+}
+.league-header h2 { margin: 0; color: #fff; font-size: 1.1em; }
+.league-header p { margin: 8px 0 0 0; color: #9fb2b8; font-size: 0.9em; }
+
+.league-state-badge {
+    margin-top: 10px;
+    display: inline-block;
+    font-size: 0.68em;
+    font-weight: 900;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    border-radius: 2px;
+    padding: 4px 8px;
+}
+.league-state-badge.active  { background: rgba(3,169,244,0.18); border: 1px solid rgba(3,169,244,0.45); color: #8ed8ff; }
+.league-state-badge.completed { background: rgba(139,195,74,0.18); border: 1px solid rgba(139,195,74,0.45); color: #d6f3b7; }
+.league-state-badge.locked  { background: rgba(244,67,54,0.14); border: 1px solid rgba(244,67,54,0.42); color: #ffc3bd; }
+
+/* ── Event cards ── */
+.event-card-list { display: grid; grid-template-columns: 1fr; gap: 10px; }
+.event-card { background: #1b1b1b; border: 1px solid #343434; border-radius: var(--radius-sm); padding: 12px; }
+.event-card.locked { border-color: #4b2f2f; background: #1f1717; }
+.event-top-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
+.event-right-meta { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
+
+.event-state-badge {
+    font-size: 0.66em;
+    font-weight: 900;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    padding: 3px 7px;
+    border-radius: 2px;
+    border: 1px solid transparent;
+}
+.event-state-badge.open      { background: rgba(3,169,244,0.16); border-color: rgba(3,169,244,0.52); color: #8ed8ff; }
+.event-state-badge.completed { background: rgba(139,195,74,0.16); border-color: rgba(139,195,74,0.52); color: #d6f3b7; }
+.event-state-badge.locked    { background: rgba(244,67,54,0.16); border-color: rgba(244,67,54,0.52); color: #ffc3bd; }
+
+.event-name { color: #fff; font-weight: 800; }
+.event-track, .event-surface { color: #9e9e9e; font-size: 0.82em; margin-top: 3px; }
+.event-prize { color: var(--clr-green-light); font-size: 0.95em; font-weight: 800; }
+.event-target { margin-top: 8px; font-size: 0.78em; font-weight: 700; letter-spacing: 0.2px; }
+.event-target.pending { color: #ffcc80; }
+.event-target.met     { color: var(--clr-green-light); }
+.event-lock-reason { margin-top: 8px; margin-bottom: 8px; color: #b0b0b0; font-size: 0.76em; }
+.career-empty { color: #9e9e9e; font-size: 0.9em; padding: 6px 2px; }
+
+/* ── Inspection ── */
+.inspection-box {
+    margin-top: 10px;
+    padding: 10px;
+    background: var(--surface-0);
+    border: 1px solid #2f2f2f;
+    border-radius: 3px;
+}
+.inspection-title { font-size: 0.8em; color: #bdbdbd; margin-bottom: 7px; }
+.inspection-status { font-weight: 800; text-transform: uppercase; letter-spacing: 0.6px; }
+.inspection-status.pass { color: var(--clr-green-light); }
+.inspection-status.fail { color: #FF8A80; }
+.inspection-badges { display: flex; flex-wrap: wrap; gap: 6px; }
+.inspection-badge {
+    display: inline-block;
+    font-size: 0.72em;
+    font-weight: 800;
+    letter-spacing: 0.2px;
+    padding: 4px 7px;
+    border-radius: 2px;
+    border: 1px solid transparent;
+}
+.inspection-badge.inspection-pass { background: rgba(139,195,74,0.16); border-color: rgba(139,195,74,0.55); color: #d6f3b7; }
+.inspection-badge.inspection-fail { background: rgba(244,67,54,0.16); border-color: rgba(244,67,54,0.55); color: #ffc3bd; }
+
+/* ── Standings ── */
+.standings-panel {
+    background: #161d22;
+    border: 1px solid #31444f;
+    border-left: 5px solid var(--clr-yellow);
+    border-radius: var(--radius-sm);
+    padding: 12px;
+    margin-bottom: 14px;
+}
+.standings-title { color: #fff; font-size: 0.96em; font-weight: 800; margin-bottom: 8px; }
+.standings-head,
+.standings-row {
+    display: grid;
+    grid-template-columns: 36px 1fr 54px 58px 78px 56px;
+    gap: 8px;
+    align-items: center;
+}
+.standings-head { color: #8fb2c4; font-size: 0.72em; text-transform: uppercase; letter-spacing: 0.8px; border-bottom: 1px solid #2e3e47; padding-bottom: 6px; }
+.standings-row  { color: #d7d7d7; font-size: 0.82em; padding: 7px 0; border-bottom: 1px solid #24333c; }
+.standings-row:last-child { border-bottom: none; }
+.standings-row.is-player { color: #fff; background: rgba(3,169,244,0.10); border-radius: 3px; padding-left: 6px; padding-right: 6px; }
+
+/* ── TUNED badge ── */
+.tuned-badge {
+    background-color: #e65100;
+    color: #fff;
+    font-size: 0.60em;
+    font-weight: 800;
+    padding: 2px 5px;
+    border-radius: 2px;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    vertical-align: middle;
+    margin-left: 5px;
+    flex-shrink: 0;
+}
+
+/* ── Rival Intel ── */
+.rival-intel-panel {
+    background: #14171a;
+    border: 1px solid #2e3e47;
+    border-left: 5px solid #e65100;
+    border-radius: var(--radius-sm);
+    padding: 10px 12px;
+    margin-bottom: 14px;
+}
+.rival-intel-title { color: #e65100; font-size: 0.78em; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+.rival-intel-entry { display: flex; align-items: center; gap: 8px; padding: 5px 0; border-bottom: 1px solid #1e2d34; font-size: 0.82em; color: #b0bec5; }
+.rival-intel-entry:last-child { border-bottom: none; }
+.rival-intel-dot { width: 6px; height: 6px; border-radius: 50%; background: #e65100; flex-shrink: 0; }
+.rival-intel-empty { color: #546e7a; font-size: 0.80em; font-style: italic; padding: 4px 0; }

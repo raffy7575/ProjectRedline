@@ -1,0 +1,66 @@
+/* ─────────────────────────────────────────────────────────────────────────────
+   Modals  –  overlays, reset dialog, name entry, results panel.
+   ─────────────────────────────────────────────────────────────────────────── */
+
+/* ── Base overlay ── */
+.modal-overlay {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background-color: rgba(0,0,0,0.9);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+/* Initially hidden – JS sets style.display to 'flex' when needed */
+#name-modal-overlay,
+#reset-modal-overlay { display: none; }
+
+/* ── Modal card ── */
+.name-modal {
+    background-color: var(--surface-2);
+    border: 2px solid var(--clr-green);
+    border-radius: var(--radius-lg);
+    padding: 40px;
+    text-align: center;
+    max-width: 400px;
+    box-shadow: 0 0 30px rgba(76,175,80,0.3);
+}
+.name-modal h2 { color: #fff; margin-bottom: 15px; font-size: 1.8em; }
+.name-modal p  { color: #bbb; margin-bottom: 25px; font-size: 0.95em; }
+.name-modal .action-btn { width: 100%; }
+
+/* ── Driver name input ── */
+#driver-name-input {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 20px;
+    background-color: var(--surface-0);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-sm);
+    color: #fff;
+    font-size: 1em;
+    box-sizing: border-box;
+}
+#driver-name-input:focus {
+    outline: none;
+    border-color: var(--clr-green);
+    box-shadow: 0 0 10px rgba(76,175,80,0.2);
+}
+#driver-name-input::placeholder { color: var(--text-dim); }
+
+/* ── Modal action row ── */
+.modal-action-row { display: flex; gap: 10px; margin-top: var(--space-5); }
+
+.btn-danger    { flex: 1; background-color: var(--clr-red); border: none; }
+.btn-danger:hover { background-color: #d32f2f; }
+.btn-secondary { flex: 1; background-color: var(--surface-3); color: #fff; border: none; }
+.btn-secondary:hover { background-color: var(--surface-4); }
+
+/* ── Results panel ── */
+#results-panel { display: none; margin-top: var(--space-5); }
+
+.earnings-text   { color: var(--clr-green); font-size: 1.2em; font-weight: bold; }
+.results-accept-btn { margin-top: var(--space-5); }

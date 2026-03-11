@@ -1,0 +1,13 @@
+# Node
+node_modules/
+npm-debug.log*
+
+# Vite build output
+dist/
+
+# macOS
+.DS_Store
+
+# Editor
+.vscode/settings.json
+*.swp

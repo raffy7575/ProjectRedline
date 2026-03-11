@@ -1,0 +1,87 @@
+/* ─────────────────────────────────────────────────────────────────────────────
+   Navigation  –  HUD bar, tab strip, tab panels.
+   ─────────────────────────────────────────────────────────────────────────── */
+.hud {
+    display: flex;
+    justify-content: space-between;
+    background-color: var(--surface-2);
+    padding: 15px;
+    border-radius: var(--radius-sm);
+    margin-bottom: 20px;
+    font-weight: bold;
+    border-left: 4px solid var(--clr-green);
+    align-items: center;
+    flex-shrink: 0;
+}
+.money { color: var(--clr-green-light); }
+
+.nav-tabs {
+    display: flex;
+    gap: 5px;
+    margin-bottom: 10px;
+    flex-shrink: 0;
+}
+
+h1 { flex-shrink: 0; }
+
+/* ── Tab buttons ── */
+.tab-btn {
+    background-color: var(--surface-2);
+    color: var(--text-muted);
+    padding: 12px 20px;
+    border: 1px solid var(--border);
+    border-bottom: none;
+    border-radius: 4px 4px 0 0;
+    cursor: pointer;
+    font-weight: bold;
+    flex: 1;
+}
+.tab-btn:hover { background-color: #2a2a2a; color: #fff; }
+.tab-btn.active {
+    background-color: var(--surface-3);
+    color: var(--clr-green-light);
+    border-color: var(--clr-green);
+    border-bottom: 3px solid #161616;
+}
+
+/* ── Locked tab ── */
+.tab-btn.tab-locked,
+.tab-btn.disabled {
+    color: var(--text-faint);
+    cursor: not-allowed;
+    border-color: #2a2a2a;
+}
+.tab-btn.tab-locked { position: relative; }
+.tab-btn.tab-locked:hover { background-color: var(--surface-2); color: var(--text-dim); }
+
+/* Tooltip on locked tab */
+.tab-btn.tab-locked::after {
+    content: attr(title);
+    position: absolute;
+    bottom: calc(100% + 6px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--surface-0);
+    color: var(--focus-color);
+    font-size: 0.70em;
+    font-weight: 600;
+    white-space: nowrap;
+    padding: 4px 8px;
+    border-radius: 3px;
+    border: 1px solid var(--border);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.15s;
+    z-index: 100;
+}
+.tab-btn.tab-locked:hover::after { opacity: 1; }
+
+/* ── Tab panels ── */
+.tab-content {
+    display: none;
+    flex: 1;
+    overflow: hidden;
+    min-height: 0;
+    padding-right: 10px;
+}
+.tab-content.active { display: block; }

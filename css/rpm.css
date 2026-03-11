@@ -1,0 +1,159 @@
+/* ─────────────────────────────────────────────────────────────────────────────
+   RPM Dashboard  –  gear display, RPM bar, speed badge, shift light, animations.
+   ─────────────────────────────────────────────────────────────────────────── */
+.player-rpm-card {
+    margin-top: 0;
+    background: #101010;
+    border: 1px solid #2e2e2e;
+    border-radius: var(--radius-md);
+    padding: 10px;
+}
+.player-rpm-layout {
+    display: grid;
+    grid-template-columns: 58px 1fr;
+    min-width: 0;
+}
+
+/* ── Gear display ── */
+.player-gear-panel {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: #0b0b0b;
+    border-right: 1px solid #2a2a2a;
+    padding: 6px 2px;
+}
+.player-rpm-main {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 4px;
+    padding: 7px 10px;
+    min-width: 0;
+}
+.gear-label {
+    font-size: 0.52em;
+    color: var(--text-faint);
+    text-transform: uppercase;
+    letter-spacing: 1.8px;
+    font-weight: 700;
+    line-height: 1;
+    margin-bottom: 1px;
+}
+.gear-num {
+    font-size: 2.1em;
+    font-weight: 900;
+    font-family: 'Courier New', monospace;
+    line-height: 1;
+}
+
+/* ── RPM top row ── */
+.rpm-topline {
+    display: grid;
+    grid-template-columns: 12px auto;
+    gap: 8px;
+    align-items: center;
+    justify-content: space-between;
+}
+.shift-light {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    background: #2a0a0a;
+    border: 1px solid #4a1b1b;
+    box-shadow: inset 0 0 4px rgba(0,0,0,0.5);
+}
+.shift-light.active {
+    background: #ff2d2d;
+    border-color: #ff9e9e;
+    box-shadow: 0 0 12px rgba(255,45,45,0.9);
+    animation: shift-light-pulse 0.18s linear infinite alternate;
+}
+
+.dashboard-speed-badge {
+    font-family: 'Courier New', monospace;
+    font-size: 0.95em;
+    font-weight: 800;
+    color: #ffffff;
+    letter-spacing: 0.4px;
+    line-height: 1;
+}
+.dashboard-speed-badge span { margin-left: 4px; font-size: 0.72em; color: #8c8c8c; font-weight: 600; }
+
+/* ── RPM bar ── */
+.rpm-bar-bg {
+    width: 100%;
+    height: 14px;
+    background-color: #d9d9d9;
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    border: none;
+    position: relative;
+    padding: 0; margin: 0;
+    box-sizing: border-box;
+}
+.rpm-bar-bg.is-blinking { animation: rpm-redline-blink 0.16s linear infinite alternate; }
+.rpm-segments {
+    position: absolute;
+    inset: 0;
+    height: 100%; width: 100%;
+    margin: 0; padding: 0;
+    background: #050505;
+}
+.rpm-fill-bar {
+    position: absolute;
+    top: 0; left: 0; bottom: 0;
+    transition: width 0.08s linear;
+}
+.rpm-guide-lines { position: absolute; inset: 0; pointer-events: none; }
+.rpm-guide-line {
+    position: absolute;
+    top: 0; bottom: 0;
+    width: 2px;
+    background: rgba(217,217,217,0.95);
+    transform: translateX(-50%);
+    box-shadow: 0 0 2px rgba(255,255,255,0.2);
+}
+
+/* ── RPM scale labels ── */
+.rpm-scale {
+    position: relative;
+    width: 100%; height: 20px;
+    display: block;
+    padding: 0; margin: 0;
+    font-family: 'Courier New', monospace;
+    font-size: 0.58em;
+    color: #bdbdbd;
+    letter-spacing: 0.2px;
+}
+.rpm-scale span {
+    position: absolute;
+    bottom: 0;
+    transform: translateX(-50%);
+    padding: 0; margin: 0;
+    text-align: center;
+    min-width: 10px;
+}
+.rpm-scale span.major { color: #f0f0f0; font-weight: 700; }
+.rpm-scale span.minor { color: #8e8e8e; }
+
+/* ── RPM meta row ── */
+.rpm-meta-row { display: grid; grid-template-columns: 1fr auto; gap: 8px; align-items: end; }
+.rpm-readout  { display: flex; justify-content: flex-end; align-items: baseline; line-height: 1; }
+.rpm-text {
+    font-family: 'Courier New', monospace;
+    font-size: 0.8em;
+    font-weight: 700;
+    color: var(--text-primary);
+    letter-spacing: 0.3px;
+}
+
+/* ── Animations ── */
+@keyframes shift-light-pulse {
+    from { transform: scale(0.92); opacity: 0.75; }
+    to   { transform: scale(1.08); opacity: 1; }
+}
+@keyframes rpm-redline-blink {
+    from { box-shadow: inset 0 0 8px rgba(244,67,54,0.45); }
+    to   { box-shadow: inset 0 0 14px rgba(244,67,54,0.95); }
+}
