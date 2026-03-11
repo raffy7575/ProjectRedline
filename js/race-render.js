@@ -20,6 +20,8 @@
 const customTrackImg = new Image();
 customTrackImg.src = 'assets/Gemini_Generated_Image_mr00xzmr00xzmr00.png';
 const SHOW_NEON_TRACK_PATH = true;
+let neonPathCacheCanvas = null;
+let neonPathCacheKey = '';
 
 function hashTrackSeed(input) {
     let hash = 2166136261;
@@ -394,56 +396,81 @@ function drawTrackStartLine(ctx) {
     ctx.save();
     ctx.translate(p0.x, p0.y);
     ctx.rotate(angle);
-    ctx.fillStyle = '#ffffff';
-    ctx.fillRect(-6, -36, 12, 72);
-    for (let i = 0; i < 4; i++) {
-        ctx.fillStyle = i % 2 === 0 ? '#ffffff' : '#111111';
-        ctx.fillRect(-24 + i * 12, -36, 12, 72);
-    }
+    const lineLength = 34;
+    const lineWidth = 7;
+
+    // Subtle stripe instead of a large checkerboard block.
+    ctx.fillStyle = 'rgba(245, 250, 255, 0.74)';
+    ctx.fillRect(-(lineWidth / 2), -(lineLength / 2), lineWidth, lineLength);
+
+    ctx.fillStyle = 'rgba(120, 240, 255, 0.70)';
+    ctx.fillRect(-1, -(lineLength / 2), 2, lineLength);
+
+    ctx.strokeStyle = 'rgba(10, 20, 24, 0.58)';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(-(lineWidth / 2), -(lineLength / 2), lineWidth, lineLength);
     ctx.restore();
+}
+
+function getTrackPathCacheKey() {
+    if (trackPath.length < 2) return 'empty';
+    let first = trackPath[0];
+    let mid = trackPath[Math.floor(trackPath.length / 2)];
+    let last = trackPath[trackPath.length - 1];
+    return `${trackPath.length}|${first.x.toFixed(2)},${first.y.toFixed(2)}|${mid.x.toFixed(2)},${mid.y.toFixed(2)}|${last.x.toFixed(2)},${last.y.toFixed(2)}`;
+}
+
+function rebuildNeonPathCache() {
+    neonPathCacheCanvas = document.createElement('canvas');
+    neonPathCacheCanvas.width = CANVAS_W;
+    neonPathCacheCanvas.height = CANVAS_H;
+    let cacheCtx = neonPathCacheCanvas.getContext('2d');
+
+    cacheCtx.save();
+    cacheCtx.lineJoin = 'round';
+    cacheCtx.lineCap = 'round';
+
+    // Draw heavy glow only once into cache.
+    traceTrackPath(cacheCtx);
+    cacheCtx.strokeStyle = 'rgba(31, 255, 178, 0.18)';
+    cacheCtx.lineWidth = 34;
+    cacheCtx.shadowColor = 'rgba(31, 255, 178, 0.62)';
+    cacheCtx.shadowBlur = 26;
+    cacheCtx.stroke();
+
+    traceTrackPath(cacheCtx);
+    cacheCtx.strokeStyle = 'rgba(90, 255, 222, 0.44)';
+    cacheCtx.lineWidth = 16;
+    cacheCtx.shadowBlur = 14;
+    cacheCtx.stroke();
+
+    traceTrackPath(cacheCtx);
+    cacheCtx.strokeStyle = 'rgba(240, 255, 252, 0.90)';
+    cacheCtx.lineWidth = 2.6;
+    cacheCtx.shadowBlur = 0;
+    cacheCtx.stroke();
+
+    cacheCtx.restore();
+    neonPathCacheKey = getTrackPathCacheKey();
 }
 
 function drawNeonTrackPath(ctx) {
     if (!SHOW_NEON_TRACK_PATH || trackPath.length < 2) return;
 
-    let pulse = 0.78 + (Math.sin(performance.now() * 0.004) * 0.22);
+    let pathKey = getTrackPathCacheKey();
+    if (!neonPathCacheCanvas || neonPathCacheKey !== pathKey) rebuildNeonPathCache();
 
+    // Cheap per-frame draw: blit cached glow and add a light pulse line.
+    ctx.drawImage(neonPathCacheCanvas, 0, 0);
+
+    let pulse = 0.76 + (Math.sin(performance.now() * 0.0032) * 0.16);
     ctx.save();
     ctx.lineJoin = 'round';
     ctx.lineCap = 'round';
-
-    // Outer glow bloom.
     traceTrackPath(ctx);
-    ctx.strokeStyle = `rgba(31, 255, 178, ${(0.10 + pulse * 0.14).toFixed(3)})`;
-    ctx.lineWidth = 44;
-    ctx.shadowColor = 'rgba(31, 255, 178, 0.70)';
-    ctx.shadowBlur = 34;
+    ctx.strokeStyle = `rgba(188, 255, 242, ${(0.18 + pulse * 0.14).toFixed(3)})`;
+    ctx.lineWidth = 5;
     ctx.stroke();
-
-    // Mid glow body.
-    traceTrackPath(ctx);
-    ctx.strokeStyle = `rgba(90, 255, 222, ${(0.36 + pulse * 0.16).toFixed(3)})`;
-    ctx.lineWidth = 24;
-    ctx.shadowBlur = 20;
-    ctx.stroke();
-
-    // Animated energy lane.
-    traceTrackPath(ctx);
-    ctx.setLineDash([26, 18]);
-    ctx.lineDashOffset = -((performance.now() * 0.09) % 44);
-    ctx.strokeStyle = 'rgba(206, 255, 246, 0.90)';
-    ctx.lineWidth = 7;
-    ctx.shadowBlur = 12;
-    ctx.stroke();
-    ctx.setLineDash([]);
-
-    // Bright core.
-    traceTrackPath(ctx);
-    ctx.strokeStyle = 'rgba(240, 255, 252, 0.96)';
-    ctx.lineWidth = 3;
-    ctx.shadowBlur = 0;
-    ctx.stroke();
-
     ctx.restore();
 }
 
