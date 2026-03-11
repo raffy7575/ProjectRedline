@@ -32,12 +32,31 @@ function handleClutchSlipping(state, dt, targetSlip) {
     }
 }
 
+function shouldUseLaunchClutch(state, mechanicalEngineRpm) {
+    return state.currentGear === 0 && ((state.clutchEngagement || 0) < 0.98 || mechanicalEngineRpm < Math.max(2200, state.rpm * 0.72));
+}
+
+function updateLaunchClutch(state, dt, physics, mechanicalEngineRpm) {
+    let throttleInfluence = 0.65 + state.throttle * 0.75;
+    let speedInfluence = Math.min(1, physics.speedMs / 18);
+    state.clutchEngagement = Math.min(1, (state.clutchEngagement || 0) + dt * (0.85 + throttleInfluence * 0.55 + speedInfluence * 0.8));
+
+    let targetSlipRpm = Math.min(physics.REDLINE * 0.82, 1800 + state.throttle * (physics.REDLINE * 0.38));
+    let blendedRpm = (targetSlipRpm * (1 - state.clutchEngagement)) + (mechanicalEngineRpm * state.clutchEngagement);
+    let rpmResponse = 8 + state.clutchEngagement * 10;
+    blendRpmToTarget(state, blendedRpm, dt, rpmResponse);
+}
+
 function handleRevLimiter(state, physics) {
     if (state.rpm >= physics.REDLINE) {
-        state.rpm = physics.REDLINE - (Math.random() * 300 + 50);
+        state.rpm = Math.max(physics.REDLINE * 0.965, physics.REDLINE - 140);
         return true;
     }
     return false;
+}
+
+function blendRpmToTarget(state, targetRpm, dt, responseRate) {
+    state.rpm += (targetRpm - state.rpm) * Math.min(1, dt * responseRate);
 }
 
 function applyEngineBrake(state, physics, currentGearRatio) {
@@ -63,7 +82,11 @@ function calculateTorqueDelivery(state, physics) {
     let torqueFactor = Math.max(0.5, 1 - (rpmDelta * rpmDelta * 0.5));
     
     let powerDelivery = (state.shiftCooldown > 0) ? 0.0 : 1.0;
-    let accelStat = state.stats.acceleration / 100;
+    if (state.currentGear === 0) {
+        let clutchCoupling = 0.35 + (Math.max(0, Math.min(1, state.clutchEngagement || 0)) * 0.65);
+        powerDelivery *= clutchCoupling;
+    }
+    let accelStat = Math.max(0.40, state.stats.acceleration / 100);
     let engineTorque = state.car.torque * torqueFactor * powerDelivery * state.throttle;
     
     return engineTorque * accelStat;

@@ -39,24 +39,27 @@
     <h1>Street Racing League</h1>
     
     <div class="nav-tabs">
-        <button class="tab-btn active" onclick="openTab('tab-garage', this)">Garage & Race</button>
-        <button class="tab-btn" onclick="openTab('tab-tuning', this)">Tuning Shop</button>
-        <button class="tab-btn" onclick="openTab('tab-skills', this)">Driver Skills</button>
+        <button class="tab-btn active" data-tab="tab-garage" onclick="openTab('tab-garage', this)">Garage & Race</button>
+        <button class="tab-btn" data-tab="tab-dealership" onclick="openTab('tab-dealership', this)">Dealership</button>
+        <button class="tab-btn" id="tab-btn-tuning" data-tab="tab-tuning" onclick="openTab('tab-tuning', this)">Tuning Shop</button>
+        <button class="tab-btn" data-tab="tab-skills" onclick="openTab('tab-skills', this)">Driver Skills</button>
     </div>
 
     <div id="tab-garage" class="tab-content active">
         
         <div class="panel" id="selection-panel">
-            <h2>Next Race Event</h2>
-            <div id="random-track-display" class="track-event-box">
-                Loading Next Event...
+            <h2>Career Mode</h2>
+            <div id="career-mode" class="career-mode-panel">
+                Loading League...
             </div>
 
-            <h2 style="margin-top: 20px;">Your Garage / Dealership</h2>
-            <p style="color: #888; font-size: 0.9em; margin-bottom: 10px;">Buy a car to enter the league. Choose wisely, each has a unique strength.</p>
-            <div id="car-grid" class="car-grid"></div>
+            <h2 style="margin-top: 20px;">My Cars</h2>
+            <p style="color: #888; font-size: 0.9em; margin-bottom: 10px;">Select a car to race. Head to the <strong style="color:#8BC34A;">Dealership</strong> tab to buy new cars.</p>
+
+            <div id="owned-car-grid" class="car-grid"></div>
+
+            <div id="maintenance-panel" class="maintenance-panel" style="display: none;"></div>
             
-            <button id="start-btn" onclick="startSimulation()" style="display: none; margin-top: 20px;">Enter Race</button>
         </div>
 
         <div id="race-layout" style="display: none;">
@@ -70,6 +73,14 @@
                 <div class="race-header" id="race-header-text">Race started</div>
                 <div class="map-container">
                     <canvas id="race-track" width="600" height="300"></canvas>
+                    <div class="race-start-overlay hidden" id="race-start-overlay">
+                        <div class="start-light-board" id="start-light-board">
+                            <div class="start-light red" id="start-light-red"></div>
+                            <div class="start-light yellow" id="start-light-yellow"></div>
+                            <div class="start-light green" id="start-light-green"></div>
+                        </div>
+                        <div class="start-light-text" id="race-start-text">GET READY</div>
+                    </div>
                     <div class="map-overlay">
                         <span>Name: <strong style="color:white;" id="overlay-player-name">Driver</strong></span>
                         <span>Position: <strong style="color:white;" id="live-pos">-</strong></span>
@@ -96,6 +107,22 @@
         </div>
     </div>
 
+    <div id="tab-dealership" class="tab-content">
+        <div class="panel">
+            <h2>Dealership</h2>
+            <p style="color: #888; font-size: 0.9em; margin-bottom: 18px;">Browse available cars. Special Offers rotate automatically every 15 minutes.</p>
+
+            <div class="dealer-section-title">Stock Cars</div>
+            <div id="stock-car-grid" class="car-grid"></div>
+
+            <div class="dealer-section-header">
+                <div class="dealer-section-title">Special Offers</div>
+                <span id="dealer-countdown" class="dealer-countdown">Loading...</span>
+            </div>
+            <div id="dealer-car-grid" class="car-grid"></div>
+        </div>
+    </div>
+
     <div id="tab-tuning" class="tab-content">
         <div class="panel">
             <h2>Tuning Shop - <span id="shop-car-name" style="color: #8BC34A;">Select an owned car first</span></h2>
@@ -116,7 +143,10 @@
     <script src="js/state.js"></script>
     <script src="save.js"></script>
     <script src="js/utils.js"></script>
+    <script src="js/career.js"></script>
+    <script src="js/ai-career.js"></script>
     <script src="js/garage.js"></script>
+    <script src="js/dealership.js"></script>
     
     <!-- Physics Domain Modules -->
     <script src="js/physics/tires/model.js"></script>

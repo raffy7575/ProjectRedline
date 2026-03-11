@@ -1,9 +1,11 @@
 let selectedPlayerCar = null;
 let raceState = [];
 let animationId;
+let isRaceActive = false;
 let lastTime = 0;
 let trackPath = [];
 let globalRaceTime = 0;
+let currentRaceEvent = null;
 let isSkippingSimulation = false;
 let isFastForwardingNow = false;
 
@@ -17,3 +19,8 @@ const SPEED_TO_MS = 28;
 const METERS_PER_PROGRESS_STEP = 1.35;
 const FINAL_DRIVE_RATIO = 3.9;
 const DRIVETRAIN_EFFICIENCY = 0.88;
+const BRAKE_DISTANCE_SAFETY_MARGIN = 0.58;
+const CURVE_SPEED_SAFETY_MARGIN = 0.90;
+const CURRENT_CURVE_SPEED_MARGIN = 0.94;
+const CURVE_URGENCY_SPEED_PENALTY = 0.28;
+const EARLY_BRAKE_CURVATURE_THRESHOLD = 0.08;

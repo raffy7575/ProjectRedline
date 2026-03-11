@@ -25,9 +25,11 @@ function calculateMaxSpeedFromPower(car, stats, terrainMult) {
     let hpAjustado = car.hp * (0.5 + (stats.topSpeed / 200));
     let powerWatts = hpAjustado * 745.7;
     let cdA = Math.max(0.2, car.dragCoeff * 2.1);
-    let vmaxMs = Math.pow(powerWatts / (0.5 * rhoAir * cdA), 1 / 3);
+    // Apply terrainMult inside the cube root: at drag-limited top speed,
+    // P_available * terrainMult = P_drag  =>  v_max = (P * t / (0.5*rho*cdA))^(1/3)
+    let vmaxMs = Math.pow(powerWatts * terrainMult / (0.5 * rhoAir * cdA), 1 / 3);
     
-    return vmaxMs / INTERNAL_TO_MS; // Terrain multiplier applied separately
+    return vmaxMs / INTERNAL_TO_MS;
 }
 
 function getLoadSensitiveGrip(baseGrip, aeroLoadFactor, terrainMult) {
