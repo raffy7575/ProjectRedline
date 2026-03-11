@@ -814,6 +814,33 @@ button:disabled { background-color: #555; color: #888; cursor: not-allowed; }
 .main-race-area { display: flex; flex-direction: column; gap: 10px; }
 .race-header { background-color: #333; color: #fff; font-weight: bold; padding: 10px 15px; border-radius: 4px; border: 1px solid #444; }
 
+.telemetry-card {
+    background: linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 100%);
+    border: 1px solid #444;
+    border-left: 4px solid #03A9F4;
+    border-radius: 6px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.telemetry-card .sidebar-header {
+    color: #d9ecff;
+    letter-spacing: 1.1px;
+    font-size: 0.8em;
+    margin-bottom: 4px;
+}
+
+.telemetry-card #sidebar-stats {
+    margin-bottom: 4px;
+}
+
+.telemetry-card #player-rpm-dashboard {
+    margin-top: 2px;
+}
+
 .map-container { position: relative; background-color: #111; border: 1px solid #333; border-radius: 4px; overflow: hidden; }
 #race-track { width: 100%; display: block; background-image: radial-gradient(circle, #2a2a2a 0%, #111 100%); }
 .race-start-overlay {
