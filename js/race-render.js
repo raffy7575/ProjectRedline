@@ -19,6 +19,7 @@
 
 const customTrackImg = new Image();
 customTrackImg.src = 'assets/Gemini_Generated_Image_mr00xzmr00xzmr00.png';
+const SHOW_NEON_TRACK_PATH = true;
 
 function hashTrackSeed(input) {
     let hash = 2166136261;
@@ -402,6 +403,50 @@ function drawTrackStartLine(ctx) {
     ctx.restore();
 }
 
+function drawNeonTrackPath(ctx) {
+    if (!SHOW_NEON_TRACK_PATH || trackPath.length < 2) return;
+
+    let pulse = 0.78 + (Math.sin(performance.now() * 0.004) * 0.22);
+
+    ctx.save();
+    ctx.lineJoin = 'round';
+    ctx.lineCap = 'round';
+
+    // Outer glow bloom.
+    traceTrackPath(ctx);
+    ctx.strokeStyle = `rgba(31, 255, 178, ${(0.10 + pulse * 0.14).toFixed(3)})`;
+    ctx.lineWidth = 44;
+    ctx.shadowColor = 'rgba(31, 255, 178, 0.70)';
+    ctx.shadowBlur = 34;
+    ctx.stroke();
+
+    // Mid glow body.
+    traceTrackPath(ctx);
+    ctx.strokeStyle = `rgba(90, 255, 222, ${(0.36 + pulse * 0.16).toFixed(3)})`;
+    ctx.lineWidth = 24;
+    ctx.shadowBlur = 20;
+    ctx.stroke();
+
+    // Animated energy lane.
+    traceTrackPath(ctx);
+    ctx.setLineDash([26, 18]);
+    ctx.lineDashOffset = -((performance.now() * 0.09) % 44);
+    ctx.strokeStyle = 'rgba(206, 255, 246, 0.90)';
+    ctx.lineWidth = 7;
+    ctx.shadowBlur = 12;
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    // Bright core.
+    traceTrackPath(ctx);
+    ctx.strokeStyle = 'rgba(240, 255, 252, 0.96)';
+    ctx.lineWidth = 3;
+    ctx.shadowBlur = 0;
+    ctx.stroke();
+
+    ctx.restore();
+}
+
 function renderTrack(ctx) {
     if (trackPath.length < 2) return;
 
@@ -412,6 +457,7 @@ function renderTrack(ctx) {
         ctx.fillRect(0, 0, CANVAS_W, CANVAS_H);
     }
 
+    drawNeonTrackPath(ctx);
     drawTrackStartLine(ctx);
 }
 
