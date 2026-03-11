@@ -138,10 +138,10 @@ const shopItems = {
 
 // ── Track definitions + waypoint layouts ─────────────────────────────────────
 const tracks = [
-    { id: 't1', name: "Hammerhead", laps: 7, tarmac: 1.0, dirt: 0.0, waypoints: [ {x:0.1, y:0.2}, {x:0.8, y:0.2}, {x:0.9, y:0.4}, {x:0.7, y:0.6}, {x:0.9, y:0.8}, {x:0.5, y:0.9}, {x:0.4, y:0.6}, {x:0.2, y:0.7}, {x:0.1, y:0.5} ] },
-    { id: 't2', name: "The Serpent", laps: 5, tarmac: 0.9, dirt: 0.1, waypoints: [ {x:0.2, y:0.1}, {x:0.8, y:0.1}, {x:0.8, y:0.3}, {x:0.2, y:0.4}, {x:0.2, y:0.6}, {x:0.8, y:0.7}, {x:0.8, y:0.9}, {x:0.1, y:0.9}, {x:0.05, y:0.5} ] },
-    { id: 't3', name: "Dragon's Tail", laps: 4, tarmac: 0.5, dirt: 0.5, waypoints: [ {x:0.1, y:0.5}, {x:0.9, y:0.1}, {x:0.9, y:0.9}, {x:0.7, y:0.8}, {x:0.6, y:0.9}, {x:0.4, y:0.7}, {x:0.2, y:0.9} ] },
-    { id: 't4', name: "Muddy Canyon", laps: 4, tarmac: 0.2, dirt: 0.8, waypoints: [ {x:0.1, y:0.8}, {x:0.2, y:0.2}, {x:0.8, y:0.2}, {x:0.9, y:0.8}, {x:0.5, y:0.5} ] } 
+    { id: 't1', name: "Hammerhead", laps: 7, tarmac: 1.0, dirt: 0.0, realLapDistanceKm: 2.0, waypoints: [ {x:0.1, y:0.2}, {x:0.8, y:0.2}, {x:0.9, y:0.4}, {x:0.7, y:0.6}, {x:0.9, y:0.8}, {x:0.5, y:0.9}, {x:0.4, y:0.6}, {x:0.2, y:0.7}, {x:0.1, y:0.5} ] },
+    { id: 't2', name: "The Serpent", laps: 5, tarmac: 0.9, dirt: 0.1, realLapDistanceKm: 2.2, waypoints: [ {x:0.2, y:0.1}, {x:0.8, y:0.1}, {x:0.8, y:0.3}, {x:0.2, y:0.4}, {x:0.2, y:0.6}, {x:0.8, y:0.7}, {x:0.8, y:0.9}, {x:0.1, y:0.9}, {x:0.05, y:0.5} ] },
+    { id: 't3', name: "Dragon's Tail", laps: 4, tarmac: 0.5, dirt: 0.5, realLapDistanceKm: 1.9, waypoints: [ {x:0.1, y:0.5}, {x:0.9, y:0.1}, {x:0.9, y:0.9}, {x:0.7, y:0.8}, {x:0.6, y:0.9}, {x:0.4, y:0.7}, {x:0.2, y:0.9} ] },
+    { id: 't4', name: "Muddy Canyon", laps: 4, tarmac: 0.2, dirt: 0.8, realLapDistanceKm: 1.7, waypoints: [ {x:0.1, y:0.8}, {x:0.2, y:0.2}, {x:0.8, y:0.2}, {x:0.9, y:0.8}, {x:0.5, y:0.5} ] } 
 ];
 
 // ── Named AI rivals (mapped to car IDs) ──────────────────────────────────────
