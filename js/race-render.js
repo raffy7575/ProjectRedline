@@ -1,5 +1,5 @@
 /* =============================================================================
-     js/race-render.js  —  Visual rendering layer for track + cars
+    js/race-render.js  -  Visual rendering layer for track + cars
 
      WHAT THIS FILE DOES
      - Builds deterministic visual theme from track name/surface mix
@@ -15,7 +15,10 @@
      NOTE
      - This file affects visuals only. Race outcomes are decided by
          physics/simulation files, not by drawing styles.
-     ============================================================================= */
+    ============================================================================= */
+
+const customTrackImg = new Image();
+customTrackImg.src = 'assets/Gemini_Generated_Image_mr00xzmr00xzmr00.png';
 
 function hashTrackSeed(input) {
     let hash = 2166136261;
@@ -402,27 +405,12 @@ function drawTrackStartLine(ctx) {
 function renderTrack(ctx) {
     if (trackPath.length < 2) return;
 
-    // Current style is intentionally minimal "neon line" for clarity.
-    // Replace this section with drawTrackBackdrop/drawTrackSurface if you
-    // want the richer scenic style.
-    // Minimal classic style: clean background + green racing line only.
-    ctx.fillStyle = '#0e1510';
-    ctx.fillRect(0, 0, CANVAS_W, CANVAS_H);
-
-    traceTrackPath(ctx);
-    ctx.lineWidth = 72;
-    ctx.strokeStyle = '#0f2a18';
-    ctx.stroke();
-
-    traceTrackPath(ctx);
-    ctx.lineWidth = 54;
-    ctx.strokeStyle = '#163821';
-    ctx.stroke();
-
-    traceTrackPath(ctx);
-    ctx.lineWidth = 42;
-    ctx.strokeStyle = '#41d66b';
-    ctx.stroke();
+    if (customTrackImg.complete && customTrackImg.naturalWidth > 0) {
+        ctx.drawImage(customTrackImg, 0, 0, CANVAS_W, CANVAS_H);
+    } else {
+        ctx.fillStyle = '#0e1510';
+        ctx.fillRect(0, 0, CANVAS_W, CANVAS_H);
+    }
 
     drawTrackStartLine(ctx);
 }
