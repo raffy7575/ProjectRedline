@@ -381,10 +381,20 @@ function drawTrackStartLine(ctx) {
 function renderTrack(ctx) {
     if (trackPath.length < 2) return;
 
-    let theme = getTrackVisualTheme();
-    drawTrackBackdrop(ctx, theme);
-    drawTracksideDecor(ctx, theme);
-    drawTrackSurface(ctx, theme);
+    // Minimal classic style: clean background + green racing line only.
+    ctx.fillStyle = '#0e1510';
+    ctx.fillRect(0, 0, CANVAS_W, CANVAS_H);
+
+    traceTrackPath(ctx);
+    ctx.lineWidth = 14;
+    ctx.strokeStyle = '#163821';
+    ctx.stroke();
+
+    traceTrackPath(ctx);
+    ctx.lineWidth = 4;
+    ctx.strokeStyle = '#41d66b';
+    ctx.stroke();
+
     drawTrackStartLine(ctx);
 }
 

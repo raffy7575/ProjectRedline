@@ -36,6 +36,7 @@ function createRaceEntry(car, isPlayer, trackTarmac, trackDirt, statsOverride) {
         filteredTargetSpeed: 0,
         filteredMaxCurveAhead: 0,
         postShiftLock: 0,
+        gearHoldTimer: 0,
         currentGear: 0,
         throttle: 0,
         brake: 0,
@@ -283,7 +284,13 @@ function computeTargetSpeedData(state, physics, draftWindow) {
     state.filteredTargetSpeed += (targetSpeed - state.filteredTargetSpeed) * (targetSpeed > state.filteredTargetSpeed ? targetRiseRate : targetFallRate);
     state.filteredMaxCurveAhead += (maxCurveAhead - state.filteredMaxCurveAhead) * curveBlend;
 
-    return { targetSpeed, maxCurveAhead, trailBrakeGripBoost: 1 + Math.max(0, physics.frontLoadBias - 0.5) * Math.min(1, state.brake) * 0.22 };
+    return {
+        targetSpeed: state.filteredTargetSpeed,
+        maxCurveAhead: state.filteredMaxCurveAhead,
+        nearestCurveDistance,
+        curveLoadAhead: normalizedCurveLoad,
+        trailBrakeGripBoost: 1 + Math.max(0, physics.frontLoadBias - 0.5) * Math.min(1, state.brake) * 0.22
+    };
 }
 
 function applyDriverInputsAndSlip(state, dt, physics, targetData) {
@@ -318,6 +325,14 @@ function applyDriverInputsAndSlip(state, dt, physics, targetData) {
         let preBrake = (0.10 + mediumCurveBias * 0.34) * (0.65 + curveUrgency * 0.75);
         desiredBrake = Math.max(desiredBrake, preBrake);
         desiredThrottle *= Math.max(0.08, 1 - (mediumCurveBias * 0.75));
+    }
+
+    // Prevent rapid throttle/brake fighting that causes drivetrain oscillation.
+    if (desiredBrake > 0.08) {
+        desiredThrottle = Math.min(desiredThrottle, 0.05);
+    }
+    if (desiredThrottle > 0.6) {
+        desiredBrake *= 0.25;
     }
 
     let currIdx = ((Math.floor(state.progressIdx) % trackPath.length) + trackPath.length) % trackPath.length;
@@ -355,30 +370,35 @@ function updateGearboxAndPreForceRpm(state, dt, physics, maxCurveAhead) {
 
     if (typeof state.shiftCooldown !== 'number') state.shiftCooldown = 0;
     if (typeof state.postShiftLock !== 'number') state.postShiftLock = 0;
+    if (typeof state.gearHoldTimer !== 'number') state.gearHoldTimer = 0;
     state.shiftCooldown = Math.max(0, state.shiftCooldown - dt);
     state.postShiftLock = Math.max(0, state.postShiftLock - dt);
+    state.gearHoldTimer = Math.max(0, state.gearHoldTimer - dt);
 
     let upshiftThreshold = getUpshiftThreshold(physics, maxCurveAhead);
 
-    if (state.shiftCooldown <= 0 && state.postShiftLock <= 0) {
+    if (state.shiftCooldown <= 0 && state.postShiftLock <= 0 && state.gearHoldTimer <= 0) {
         state.isDownshifting = false;
 
         if (shouldUpshift(state, physics, upshiftThreshold)) {
             state.currentGear++;
             state.shiftCooldown = getShiftTimeForState(state, physics, state.currentGear, false);
             state.postShiftLock = 0.20;
+            state.gearHoldTimer = 0.36;
             currentGearRatio = getEffectiveGearRatio(physics, state.currentGear);
         } else if (shouldDownshiftCorner(state, physics, wheelRpmReal, currentGearRatio, maxCurveAhead)) {
             state.currentGear--;
             state.shiftCooldown = getShiftTimeForState(state, physics, state.currentGear, true);
             state.isDownshifting = true;
             state.postShiftLock = 0.16;
+            state.gearHoldTimer = 0.30;
             currentGearRatio = getEffectiveGearRatio(physics, state.currentGear);
         } else if (shouldDownshiftAccel(state, physics, wheelRpmReal, currentGearRatio)) {
             state.currentGear--;
             state.shiftCooldown = getShiftTimeForState(state, physics, state.currentGear, true);
             state.isDownshifting = true;
             state.postShiftLock = 0.16;
+            state.gearHoldTimer = 0.30;
             currentGearRatio = getEffectiveGearRatio(physics, state.currentGear);
         }
     }
@@ -433,7 +453,7 @@ function syncPostForceRpm(state, dt, physics, drivetrainData) {
         }
         
         if (state.rpm >= physics.REDLINE) {
-            state.rpm = physics.REDLINE - (Math.random() * 300 + 50);
+            state.rpm = Math.max(physics.REDLINE * 0.965, physics.REDLINE - 140);
         }
     }
 
