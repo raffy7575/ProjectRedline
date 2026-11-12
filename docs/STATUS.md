@@ -26,41 +26,47 @@ Medido a correr o jogo num browser headless e a física em Node, não só por le
 
 Conclusão: o núcleo de corrida não era recuperável com ajustes (unidades internas incoerentes, curvatura normalizada com constantes mágicas). Foi reescrito em unidades SI.
 
-## 2. O que já está feito (em `src/`, ainda NÃO ligado ao `index.html`)
+## 2. O que foi feito
 
-Verificado com simulações headless (tempos por volta plausíveis, ultrapassagens, erros, desgaste).
+O jogo foi reconstruído em módulos ES sob `src/` e o código do protótipo foi removido.
 
-- `src/sim/track.js` — geometria real: spline, reamostragem a 2 m, curvatura em 1/m, zonas de terra, lista de curvas.
-- `src/sim/vehicle.js` — ficha técnica → curva de binário, caixa, grip, travagem, aero, top speed.
-- `src/sim/profile.js` — perfil de velocidade ideal (curva + travagem + motor) e tempo por volta.
-- `src/sim/race.js` — corrida em passo fixo de 1/60 s: semáforos e arranque com tempo de reação, tráfego/ultrapassagens, cone de ar, nitro, desgaste de pneus, erros, modos de ritmo (Save/Race/Push), classificação. Skip dá o mesmo resultado que tempo real.
-- `src/data/*` — 15 carros em 4 classes, 10 categorias de upgrades, 9 pistas distintas, 4 ligas × 4 eventos, 12 rivais com personalidade, 6 skills, 20 conquistas.
-- `src/core/store.js` — estado único, save/load, migração do save antigo (`projectRedlineSaveV1`), export/import.
-- `src/game/*` — Performance Index medido por simulação, garagem (comprar/vender/pintar/equipar/reparar), carreira (desbloqueios, classificação, qualificação, bounty, prémios, recordes), economia dos rivais, XP/níveis/conquistas, desafio diário, ofertas especiais rotativas.
-- `public/img/serpent-city.webp` — o mapa da cidade comprimido de 8,9 MB para 0,4 MB.
+**Núcleo de corrida (`src/sim/`)**, em unidades SI e passo fixo de 1/60 s:
+- Geometria real das pistas (spline, amostras de 2 m, curvatura em 1/m, zonas de terra).
+- Ficha técnica → curva de binário, caixa, grip, travagem, aero.
+- Perfil de velocidade ideal por carro e pista (curva, travagem, motor).
+- Corrida: semáforos e arranque com tempo de reação, tráfego e ultrapassagens, cone de ar, nitro, desgaste de pneus, erros de travagem, modos de ritmo. Skip e 4x dão o mesmo resultado que tempo real.
+
+**Decisões do jogador durante a corrida:** arranque (Espaço ao apagar das luzes), nitro (segurar Espaço), ritmo Save/Race/Push (1/2/3), câmara (C), pausa (P), velocidade 1x/2x/4x, skip.
+
+**Conteúdo:** 15 carros em 4 classes, 10 categorias de upgrades, 9 pistas distintas (mais versões invertidas), 4 ligas × 4 eventos com grelha de 8, 12 rivais com personalidade que compram peças, 6 skills, 20 conquistas, desafio diário com streak, ofertas especiais rotativas, recordes de volta.
+
+**Sistemas:** Performance Index medido por simulação com teto por liga; XP e níveis; desgaste e manutenção (a partir da Semi-Pro); bounty por evento; prémio de repetição a 50%; classificação conta o melhor resultado por evento.
+
+**Técnico:** save novo com migração do `projectRedlineSaveV1` (nome, dinheiro, carros iniciais e peças), export/import; 37 testes vitest; CI em GitHub Actions; build Vite sem plugins (bundle 107 kB, mapa da cidade de 8,9 MB → 0,4 MB); `netlify.toml`; layout responsivo; áudio sintetizado com mute.
+
+**Verificado:** `npm test` (37/37), `npm run build`, e jogado num browser headless em desktop e iPhone: criação de perfil, compra, tuning, liga amadora, resultados, persistência após reload, sem erros de consola.
 
 ## 3. O que falta
 
-### Bloqueante (sem isto o jogo novo não corre no browser)
-- [ ] **UI nova** em `src/ui/`: cabeçalho (dinheiro, nível, som, definições), ecrãs Career, Garage, Dealer, Tuning, Driver, modal de pré-corrida (grelha), ecrã de resultados, toasts.
-- [ ] **Renderização da corrida** em `src/render/`: pista procedural por tema, carros desenhados, câmara de perseguição + minimapa, partículas, HUD (posição, volta, gaps, RPM, pneus, nitro, botões de ritmo, velocidade 1x/2x/4x, skip).
-- [ ] **Input**: Espaço = arranque/nitro, 1/2/3 = ritmo, C = câmara; botões táteis equivalentes.
-- [ ] Novo `index.html` + CSS; `src/main.js` como entrada real.
-- [ ] Apagar o código antigo: `js/`, `data.js`, `save.js`, `engine.js`, `css/` antigo, `assets/*.png` (8,9 MB), `fix_targetspeed.txt`, `CHANGES.md`.
-- [ ] Simplificar `vite.config.js` (remover plugin de scripts clássicos e `terser`), `base: './'`.
+### Não verificado nesta sessão
+- [ ] **Som**: o código corre sem erros, mas ninguém o ouviu (browser headless). Rever volumes e timbre do motor.
+- [ ] **Equilíbrio das ligas C, B e A com um humano a jogar.** Só foi medido com piloto automático: carro de série acaba em 3º–5º no primeiro evento de cada liga e desce para 6º–8º se não for afinado. Falta confirmar que tuning + jogo ativo chegam para ganhar, e que o grind entre ligas não é excessivo.
+- [ ] Jogo em dispositivos táteis reais (o botão NITRO usa pointer events; testado só em emulação).
+- [ ] Corrida completa em tempo real a 1x numa pista longa (testado com 4x + skip).
 
-### Equilíbrio (medido, por corrigir)
-- [ ] PI de série acima do teto da classe em alguns carros (Grip Master 305 e Kettle 301 > 300; Kaido RS 401 > 400): ajustar fichas ou tetos.
-- [ ] Piloto automático do jogador com carro de série acaba em 7º–8º nas ligas C/B/A: os rivais chegam demasiado afinados. Reduzir orçamento inicial dos rivais e/ou `rivalSkill`.
-- [ ] Colossus SRT e Zenith R são sempre últimos na sua classe: rever fichas.
-- [ ] Duração das corridas A (até 385 s) é longa: reduzir voltas.
-- [ ] Rivais acumulam dinheiro sem o gastar quando batem no teto de PI (Nyx com $82k): limitar ou ignorar.
+### Problemas conhecidos
+- [ ] Dusty Ranger é o último em asfalto (7º–8º) e o Grip Master o último em terra: é intencional, mas o primeiro carro pode prender um jogador no evento 3 da liga D sem dinheiro para pneus de terra ($1 000). Há um aviso no cartão do evento; considerar garantir esse dinheiro ou emprestar pneus.
+- [ ] Travões, aero, caixa e nitro quase não mexem no PI (+0 a +2), porque o circuito de referência é limitado pelo grip dos pneus de série. São melhorias "grátis" sob o teto. Decidir se é desejado.
+- [ ] Zenith R é claramente o pior carro da classe A; Colossus SRT o pior da B. Estão mais baratos, mas rever.
+- [ ] Sem colisões: os carros bloqueiam-se e ultrapassam por faixas, mas os desenhos podem sobrepor-se na grelha e em curvas apertadas.
+- [ ] Carros iguais comprados duas vezes não se distinguem na garagem (falta nome ou número).
 
-### Qualidade
-- [ ] Testes (`vitest`) para sim, carreira, save/migração, economia.
-- [ ] Áudio (WebAudio): motor, semáforos, nitro, com botão de mute.
-- [ ] `README.md` novo, CI (build + testes), `netlify.toml`.
-- [ ] Verificação final com Playwright: carreira completa de ponta a ponta, screenshots.
+### Ideias para a seguir
+- [ ] Multiplayer assíncrono: tabela global de recordes por pista e desafio diário partilhado (o seed já é igual para todos). Há Supabase ligado à conta, serviria de backend.
+- [ ] Meteorologia (chuva muda o grip a meio da corrida) e paragens nas boxes em corridas longas.
+- [ ] Patrocinadores com objetivos por corrida.
+- [ ] Editor de pistas (as pistas são só listas de pontos).
+- [ ] Mais ligas ou um modo "endurance" depois da Elite.
 
 ## 4. Como retomar
 
@@ -72,4 +78,8 @@ npm ci
 npm run dev
 ```
 
-O jogo servido ainda é o antigo até a UI nova estar ligada. Os módulos novos testam-se em Node diretamente (são ES modules sem dependências de DOM, exceto `store.js`, que aceita storage falso via `setStorage`).
+```bash
+npm test
+```
+
+Mapa do código e instruções para acrescentar carros, pistas e eventos estão no `README.md`.

@@ -224,7 +224,7 @@ export function createRaceView(canvas, miniCanvas, race) {
             tx = (minX + maxX) / 2;
             ty = (minY + maxY) / 2;
         } else {
-            const base = clamp(Math.min(viewW, viewH) / 150, 3.2, 7.5);
+            const base = clamp(Math.min(viewW, viewH) / 150, 4.6, 7.5);
             targetZoom = Math.max(fitZoom, base * lerp(1, 0.62, clamp(focus.v / 75, 0, 1)));
             const lead = clamp(focus.v * 0.55, 0, 34);
             tx = focusPose.x + Math.cos(focusPose.heading) * lead;
@@ -291,7 +291,7 @@ export function createRaceView(canvas, miniCanvas, race) {
 
         for (const d of decor) if (visible(d.x, d.y)) drawDecor(d);
 
-        const scale = clamp(9 / cam.zoom, 1, 7); // keep cars readable when zoomed out
+        const scale = clamp(6.5 / cam.zoom, 1, 6); // keep cars readable when zoomed out
         const poses = race.cars.map(car => ({ car, pose: carPose(car) }));
         poses.sort((a, b) => (a.car.isPlayer ? 1 : 0) - (b.car.isPlayer ? 1 : 0));
         for (const { car, pose } of poses) drawCar(car, pose, scale);

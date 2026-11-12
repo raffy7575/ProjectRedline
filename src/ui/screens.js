@@ -98,6 +98,9 @@ function heroCard(car) {
     const { league, event } = next;
     const ok = car && checkEligibility(car, league).ok;
     const record = state.records[trackKey(event.trackId, event.reverse)];
+    const dirtShare = trackFor(event).dirtShare;
+    const dirtTip = car && dirtShare > 0.3 && getTunedSpec(car).dirtGrip < 0.7
+        ? `<p class="warn" style="margin-bottom:10px">⚠ ${Math.round(dirtShare * 100)}% of this lap is dirt and your car has road tyres. Fit Rally Gravel tyres in Tuning, or bring a rally car.</p>` : '';
     return `<div class="panel hero">
         ${trackMap(event)}
         <div>
@@ -110,6 +113,7 @@ function heroCard(car) {
                 ${record ? `<span class="badge">Your record ${fmtTime(record.lap)}</span>` : ''}
                 ${car ? eligibilityBadges(car, league) : ''}
             </div>
+            ${dirtTip}
             <div class="row">
                 <button class="btn primary big" data-action="enter-event" data-event="${event.id}" ${ok ? '' : 'disabled'}>RACE</button>
                 ${!car ? '<span class="warn">Buy a car at the Dealer first.</span>' : (!ok ? '<span class="warn">Car is over the PI cap: detune it in Tuning or pick another car.</span>' : '')}

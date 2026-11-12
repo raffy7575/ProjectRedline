@@ -236,8 +236,16 @@ button.car-card:hover { border-color: var(--muted); }
     .screen { padding: 12px; }
     .hero { grid-template-columns: 96px 1fr; }
     .tune-cat { grid-template-columns: 1fr; }
-    .rh-tower { width: 170px; }
-    .rh-mini canvas { width: 110px; height: 110px; }
+    .rh-top { top: 8px; }
+    .rh-box { padding: 5px 12px; }
+    .rh-box b { font-size: 17px; }
+    .rh-tower { width: 158px; top: 64px; left: 8px; }
+    .rh-mini { top: 64px; right: 8px; }
+    .rh-mini canvas { width: 110px; height: 110px; margin-left: auto; }
+    .rh-ctl { flex-wrap: wrap; max-width: 150px; margin-left: auto; }
+    .rh-center { top: 44%; }
+    .lights i { width: 26px; height: 26px; }
+    .big-msg { font-size: 34px; }
     .rh-top .hide-s { display: none; }
     .rh-feed { display: none; }
     .rh-dash { grid-template-columns: auto 1fr auto; gap: 6px; }
