@@ -1,29 +1,13 @@
 {
   "name": "project-redline",
-  "version": "0.1.0",
-  "description": "Street Racing League \u2013 browser MMORPG prototype",
+  "version": "1.0.0",
+  "description": "Project Redline: street racing career sim with live race strategy",
   "private": true,
-  "x-maintainer-notes": {
-    "what-this-file-does": "Defines project metadata, npm scripts, and dependencies.",
-    "safe-to-change": [
-      "scripts.dev/build/preview commands",
-      "version when releasing",
-      "description/repository/homepage metadata"
-    ],
-    "do-not-remove": [
-      "vite in devDependencies",
-      "terser in devDependencies"
-    ],
-    "script-meanings": {
-      "dev": "Start local development server with fast reload",
-      "build": "Create production bundle in dist/",
-      "preview": "Serve dist/ locally to test production output"
-    }
-  },
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test": "vitest run"
   },
   "repository": {
     "type": "git",
@@ -37,8 +21,8 @@
   },
   "homepage": "https://github.com/raffy7575/ProjectRedline#readme",
   "devDependencies": {
-    "terser": "^5.46.0",
-    "vite": "^7.3.1"
+    "vite": "^7.3.1",
+    "vitest": "^3.2.4"
   },
   "type": "module"
 }

@@ -11,17 +11,17 @@
 export const CAR_CLASSES = ['D', 'C', 'B', 'A'];
 
 export const CLASS_INFO = {
-    D: { label: 'Class D', color: '#58b4ff', piCap: 300, upgradeCostMul: 1, serviceMul: 1 },
-    C: { label: 'Class C', color: '#5fd38d', piCap: 400, upgradeCostMul: 2.4, serviceMul: 2 },
+    D: { label: 'Class D', color: '#58b4ff', piCap: 310, upgradeCostMul: 1, serviceMul: 1 },
+    C: { label: 'Class C', color: '#5fd38d', piCap: 410, upgradeCostMul: 2.4, serviceMul: 2 },
     B: { label: 'Class B', color: '#ffc247', piCap: 520, upgradeCostMul: 5.5, serviceMul: 4 },
-    A: { label: 'Class A', color: '#ff5a4d', piCap: 680, upgradeCostMul: 12, serviceMul: 8 }
+    A: { label: 'Class A', color: '#ff5a4d', piCap: 700, upgradeCostMul: 12, serviceMul: 8 }
 };
 
 export const CARS = [
     // ── Class D: starter cars ────────────────────────────────────────────────
     {
         id: 'c1', name: 'Apex Bullet', cls: 'D', price: 2800, color: '#f44336', body: 'hatch', drivetrain: 'FWD',
-        hp: 98, weight: 960, redline: 6800, gears: 5, cdA: 0.66, clA: 0.05, grip: 0.90, dirtGrip: 0.52, brake: 0.92,
+        hp: 100, weight: 950, redline: 6800, gears: 5, cdA: 0.66, clA: 0.05, grip: 0.92, dirtGrip: 0.52, brake: 0.92,
         blurb: 'Light, eager hot hatch. The all-rounder of the amateur grid.'
     },
     {
@@ -31,7 +31,7 @@ export const CARS = [
     },
     {
         id: 'c3', name: 'Dusty Ranger', cls: 'D', price: 2600, color: '#ff9800', body: 'rally', drivetrain: 'AWD',
-        hp: 106, weight: 1130, redline: 6200, gears: 5, cdA: 0.72, clA: 0.03, grip: 0.86, dirtGrip: 0.76, brake: 0.90,
+        hp: 112, weight: 1110, redline: 6200, gears: 5, cdA: 0.70, clA: 0.03, grip: 0.89, dirtGrip: 0.76, brake: 0.90,
         blurb: 'All-wheel drive and knobbly tyres. Slow on tarmac, king of the dirt.'
     },
     {
@@ -43,7 +43,7 @@ export const CARS = [
     // ── Class C ──────────────────────────────────────────────────────────────
     {
         id: 'c-hornet', name: 'Volt Hornet', cls: 'C', price: 11500, color: '#ffd400', body: 'hatch', drivetrain: 'FWD',
-        hp: 198, weight: 1190, redline: 7000, gears: 6, cdA: 0.66, clA: 0.12, grip: 1.01, dirtGrip: 0.54, brake: 1.08,
+        hp: 205, weight: 1170, redline: 7000, gears: 6, cdA: 0.66, clA: 0.14, grip: 1.03, dirtGrip: 0.54, brake: 1.08,
         blurb: 'Turbo hatch with sharp brakes. Forgiving and quick everywhere.'
     },
     {
@@ -58,14 +58,14 @@ export const CARS = [
     },
     {
         id: 'c-brawler', name: 'Brawler 302', cls: 'C', price: 12000, color: '#ff5722', body: 'muscle', drivetrain: 'RWD',
-        hp: 292, weight: 1590, redline: 6200, gears: 5, cdA: 0.78, clA: 0.04, grip: 0.95, dirtGrip: 0.50, brake: 0.98,
+        hp: 305, weight: 1560, redline: 6200, gears: 5, cdA: 0.76, clA: 0.06, grip: 0.98, dirtGrip: 0.50, brake: 0.98,
         blurb: 'V8 muscle. Wins drag races, loses arguments with corners.'
     },
 
     // ── Class B ──────────────────────────────────────────────────────────────
     {
         id: 'b-specter', name: 'Specter GT', cls: 'B', price: 38000, color: '#607d8b', body: 'coupe', drivetrain: 'RWD',
-        hp: 395, weight: 1430, redline: 7400, gears: 6, cdA: 0.64, clA: 0.42, grip: 1.10, dirtGrip: 0.52, brake: 1.20,
+        hp: 410, weight: 1400, redline: 7400, gears: 6, cdA: 0.64, clA: 0.46, grip: 1.13, dirtGrip: 0.52, brake: 1.20,
         blurb: 'Grand tourer with real pace. Stable, fast and brutally consistent.'
     },
     {
@@ -80,14 +80,14 @@ export const CARS = [
     },
     {
         id: 'b-colossus', name: 'Colossus SRT', cls: 'B', price: 36000, color: '#b71c1c', body: 'muscle', drivetrain: 'RWD',
-        hp: 525, weight: 1780, redline: 6400, gears: 6, cdA: 0.80, clA: 0.15, grip: 1.04, dirtGrip: 0.50, brake: 1.12,
+        hp: 570, weight: 1740, redline: 6400, gears: 6, cdA: 0.78, clA: 0.20, grip: 1.08, dirtGrip: 0.50, brake: 1.12,
         blurb: 'Supercharged sledgehammer. Needs long straights and a brave driver.'
     },
 
     // ── Class A ──────────────────────────────────────────────────────────────
     {
         id: 'a-zenith', name: 'Zenith R', cls: 'A', price: 125000, color: '#eceff1', body: 'coupe', drivetrain: 'AWD',
-        hp: 645, weight: 1540, redline: 7600, gears: 7, cdA: 0.66, clA: 0.95, grip: 1.21, dirtGrip: 0.60, brake: 1.42,
+        hp: 700, weight: 1490, redline: 7600, gears: 7, cdA: 0.66, clA: 0.95, grip: 1.21, dirtGrip: 0.60, brake: 1.42,
         blurb: 'All-weather supercar. Devastating traction out of slow corners.'
     },
     {

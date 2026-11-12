@@ -186,10 +186,10 @@ export function ratingBars(perf) {
     const h = headlineStats(perf);
     const pct = (v, lo, hi) => Math.round(clamp((v - lo) / (hi - lo), 0, 1) * 100);
     return {
-        speed: pct(h.topSpeedKmh, 130, 400),
-        accel: pct(1 / h.zeroToHundred, 1 / 13, 1 / 2.4),
-        handling: pct(h.lateralG, 0.8, 2.0),
-        braking: pct(h.brakeG, 0.75, 1.75),
-        dirt: pct(h.dirtGrip, 0.4, 1.0)
+        speed: pct(h.topSpeedKmh, 110, 400),
+        accel: pct(1 / h.zeroToHundred, 1 / 20, 1 / 2.3),
+        handling: pct(h.lateralG, 0.55, 1.9),
+        braking: pct(h.brakeG, 0.5, 1.7),
+        dirt: pct(h.dirtGrip, 0.3, 1.0)
     };
 }

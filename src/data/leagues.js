@@ -8,7 +8,7 @@ export const REPLAY_PRIZE_FACTOR = 0.5;
 
 export const LEAGUES = [
     {
-        id: 'D', name: 'Amateur League', tier: 1, piCap: 300, rivalSkill: 0.953, championBonus: 4000, xpMul: 1,
+        id: 'D', name: 'Amateur League', tier: 1, piCap: 310, rivalSkill: 0.948, championBonus: 4000, xpMul: 1,
         description: 'Entry-level street series. Cheap cars, close racing, big egos.',
         roster: [
             ['rival-ember', 'd4'], ['rival-apex', 'c2'], ['rival-shale', 'c3'], ['rival-juno', 'c1'],
@@ -22,7 +22,7 @@ export const LEAGUES = [
         ]
     },
     {
-        id: 'C', name: 'Semi-Pro League', tier: 2, piCap: 400, rivalSkill: 0.960, championBonus: 12000, xpMul: 1.5,
+        id: 'C', name: 'Semi-Pro League', tier: 2, piCap: 410, rivalSkill: 0.952, championBonus: 12000, xpMul: 1.5,
         description: 'Faster circuits, sharper drivers and rivals who spend their winnings on parts.',
         roster: [
             ['rival-ember', 'c-brawler'], ['rival-apex', 'c-kaido'], ['rival-shale', 'c-ridge'], ['rival-juno', 'c-hornet'],
@@ -36,7 +36,7 @@ export const LEAGUES = [
         ]
     },
     {
-        id: 'B', name: 'Pro League', tier: 3, piCap: 520, rivalSkill: 0.967, championBonus: 32000, xpMul: 2.2,
+        id: 'B', name: 'Pro League', tier: 3, piCap: 520, rivalSkill: 0.956, championBonus: 32000, xpMul: 2.2,
         description: 'Serious machinery. Tyre management and clean laps decide championships here.',
         roster: [
             ['rival-ember', 'b-colossus'], ['rival-apex', 'b-venom'], ['rival-shale', 'b-tundra'], ['rival-vex', 'b-specter'],
@@ -50,7 +50,7 @@ export const LEAGUES = [
         ]
     },
     {
-        id: 'A', name: 'Elite League', tier: 4, piCap: 680, rivalSkill: 0.974, championBonus: 100000, xpMul: 3.2,
+        id: 'A', name: 'Elite League', tier: 4, piCap: 700, rivalSkill: 0.960, championBonus: 100000, xpMul: 3.2,
         description: 'The top of the street. Hypercars, the Redline Ring and no second chances.',
         roster: [
             ['rival-ember', 'a-hyperion'], ['rival-apex', 'a-phantom'], ['rival-vex', 'a-zenith'], ['rival-sable', 'a-phantom'],
@@ -60,7 +60,7 @@ export const LEAGUES = [
             { id: 'ev-a1', name: 'Ring Opener', trackId: 't-ring', laps: 3, prize: 28000, target: 3 },
             { id: 'ev-a2', name: 'Coastline GP', trackId: 't-coast', reverse: true, laps: 4, prize: 32000, target: 3 },
             { id: 'ev-a3', name: 'Alpine Summit', trackId: 't-alpine', reverse: true, laps: 3, prize: 36000, target: 2 },
-            { id: 'ev-a4', name: 'Redline Grand Final', trackId: 't-ring', laps: 5, prize: 65000, target: 1 }
+            { id: 'ev-a4', name: 'Redline Grand Final', trackId: 't-ring', laps: 4, prize: 65000, target: 1 }
         ]
     }
 ];

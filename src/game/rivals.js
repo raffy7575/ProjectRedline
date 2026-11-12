@@ -86,8 +86,7 @@ export function ensureLeagueRivals(league) {
         if (wallets[rivalId]) return;
         const model = CARS.find(c => c.id === modelId);
         const rival = getRival(rivalId);
-        wallets[rivalId] = { money: Math.round(1400 * CLASS_INFO[model.cls].upgradeCostMul * (1 + rival.talent * 30)), items: [] };
-        shop(league, rivalId, 2);
+        wallets[rivalId] = { money: Math.round(500 * CLASS_INFO[model.cls].upgradeCostMul * (1 + rival.talent * 30)), items: [] };
     });
 }
 
@@ -106,7 +105,7 @@ export function payAndShopRivals(league, event, classification) {
         if (result.isPlayer) return;
         const wallet = state.career.rivals[league.id][result.id];
         if (!wallet) return;
-        wallet.money += Math.round(event.prize * (PRIZE_SPLIT[result.position - 1] || 0.05));
+        wallet.money = Math.min(wallet.money + Math.round(event.prize * 0.6 * (PRIZE_SPLIT[result.position - 1] || 0.05)), event.prize * 2);
         const rival = getRival(result.id);
         shop(league, result.id, 1).forEach(part => {
             const line = (INTEL_LINES[rival.bias] || INTEL_LINES.balanced)(rival.name.split(' ')[0], part);
